@@ -10,6 +10,9 @@ node_modules
 .DS_Store
 Thumbs.db
 
+# Local
+/documentation
+
 # Env
 .env
 .env.*

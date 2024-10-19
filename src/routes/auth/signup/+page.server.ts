@@ -1,38 +1,43 @@
-import { redirect } from '@sveltejs/kit';
+import { redirect, fail } from '@sveltejs/kit';
+
 import { generateAvatar } from '$lib/server';
 import type { Actions } from './$types';
+
+function getInitials(firstName: string, lastName: string): string {
+	return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+}
+
+function getAvatarColor(initials: string): string {
+	let hash = 0;
+	for (let i = 0; i < initials.length; i++) {
+		hash = initials.charCodeAt(i) + ((hash << 5) - hash);
+	}
+	const hue = hash % 360;
+	return `hsl(${hue}, 70%, 60%)`;
+}
 
 export const actions: Actions = {
 	signup: async ({ url, request, locals: { supabase } }) => {
 		const formData = await request.formData();
-		const firstName = formData.get('firstName') as string;
-		const lastName = formData.get('lastName') as string;
+		// const firstName = formData.get('firstName') as string;
+		// const lastName = formData.get('lastName') as string;
 		const email = formData.get('email') as string;
 		const password = formData.get('password') as string;
 		const provider = formData.get('provider') as string;
-		const avatar = formData.get('avatar') as File | null;
-		const initials = formData.get('initials') as string;
-		const avatarColor = formData.get('avatarColor') as string;
 
-		let avatarFile = avatar;
-
-		if (!avatarFile || avatarFile.size === 0) {
-			avatarFile = generateAvatar(initials, avatarColor);
+		if (!password) {
+			return fail(400, {
+				success: false,
+				errors: { password: 'Password is required' }
+			});
 		}
-		console.log('url.origin:', url.origin);
-
 		switch (provider) {
 			case 'email':
-				const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+				const { error: signUpError } = await supabase.auth.signUp({
 					email,
-					password,
-					options: {
-						data: {
-							firstName,
-							lastName
-						}
-					}
+					password
 				});
+
 				if (signUpError) {
 					return {
 						errors: {
@@ -49,7 +54,6 @@ export const actions: Actions = {
 						redirectTo: `${url.origin}/authorised/profile`
 					}
 				});
-				console.log('GitHub data:', githubData.url);
 				if (githubError) {
 					console.error('GitHub error:', githubError);
 					return {
@@ -60,8 +64,8 @@ export const actions: Actions = {
 					};
 				}
 				if (githubData.url) {
-					console.log('Redirecting to GitHub URL:', githubData.url);
-					redirect(303, githubData.url);
+					// console.log('Redirecting to GitHub URL');
+					redirect(307, githubData.url);
 				}
 				break;
 			case 'discord':

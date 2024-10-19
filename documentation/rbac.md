@@ -410,3 +410,92 @@ Create API routes to handle admin operations:
   6. API routes handle admin-specific operations securely.
 
  
+ I understand your requirement now. You want to connect from external applications like QGIS or DBeaver using connection strings that provide limited access based on the information in the connection string. This is a common need for GIS and database management tools. Here's how you can approach this:
+
+Database Roles and Users: Instead of trying to use the 'auth.users' table directly, create database roles and users that correspond to your application's access levels.
+-- Create roles for different access levels
+CREATE ROLE readonly;
+CREATE ROLE readwrite;
+CREATE ROLE admin;
+
+-- Grant appropriate permissions to these roles
+GRANT USAGE ON SCHEMA public TO readonly, readwrite, admin;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO readonly, readwrite, admin;
+GRANT INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO readwrite, admin;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO admin;
+
+-- Create database users for external connections
+CREATE USER qgis_user WITH PASSWORD 'strong_password';
+CREATE USER dbeaver_user WITH PASSWORD 'another_strong_password';
+
+-- Assign roles to users
+GRANT readonly TO qgis_user;
+GRANT readwrite TO dbeaver_user;
+
+Row Level Security (RLS): Implement RLS policies to further restrict access based on user attributes:
+-- Enable RLS on your spatial tables
+ALTER TABLE spatial_schema.your_spatial_table ENABLE ROW LEVEL SECURITY;
+
+-- Create a policy
+CREATE POLICY user_data_access ON spatial_schema.your_spatial_table
+    FOR ALL
+    USING (user_id = current_setting('app.current_user_id')::uuid);
+
+-- Function to set the current user ID
+CREATE OR REPLACE FUNCTION set_user_id(user_id uuid)
+RETURNS void AS $$
+BEGIN
+  PERFORM set_config('app.current_user_id', user_id::text, false);
+END;
+$$ LANGUAGE plpgsql;
+
+Connection Process: When a user connects via QGIS or DBeaver, they would use a connection string like this:
+postgresql://qgis_user:strong_password@your-supabase-project.supabase.co:5432/postgres
+
+User Authentication and ID Setting: Create a login function that authenticates the user and sets the user ID:
+CREATE OR REPLACE FUNCTION login(username text, password text)
+RETURNS boolean AS $$
+DECLARE
+    user_id uuid;
+BEGIN
+    -- Check credentials against your auth system
+    -- This is a simplified example; implement secure authentication!
+    SELECT id INTO user_id FROM auth.users WHERE email = username AND encrypted_password = crypt(password, encrypted_password);
+    
+    IF FOUND THEN
+        PERFORM set_user_id(user_id);
+        RETURN true;
+    ELSE
+        RETURN false;
+    END IF;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+Connection Wrapper: Create a wrapper function that users must call upon connection:
+CREATE OR REPLACE FUNCTION initialize_connection(username text, password text)
+RETURNS void AS $$
+BEGIN
+    IF NOT login(username, password) THEN
+        RAISE EXCEPTION 'Invalid credentials';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+Usage in QGIS or DBeaver: After connecting, users would need to call the initialize_connection function:
+SELECT initialize_connection('user@example.com', 'user_password');
+
+This approach provides several benefits:
+
+It allows external applications to connect using standard connection strings.
+It maintains security by using database roles and RLS.
+It ties into your existing auth.users table for authentication.
+It provides fine-grained access control at both the role and row level.
+Important considerations:
+
+Ensure that the database passwords are different from the auth.users passwords.
+Implement proper password hashing and security measures in the login function.
+Be cautious about exposing database connection details. Use a VPN or IP whitelisting if possible.
+Regularly audit and rotate database passwords.
+This setup requires users to manually call initialize_connection. You might want to automate this (e.g., using a trigger on connection).
+Supabase may have limitations on creating roles or users. Check their documentation or contact their support for specifics about your plan.
+Remember, this is a basic framework. You'll need to adapt it to your specific security requirements and Supabase's capabilities. Always prioritize security when dealing with database connections and user authentication.

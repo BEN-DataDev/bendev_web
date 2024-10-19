@@ -1,30 +1,47 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 	import { Button, Heading } from 'svelte-5-ui-lib';
-	import { GithubSolid, DiscordSolid, LinkedinSolid } from 'flowbite-svelte-icons';
+	import { GithubSolid, DiscordSolid } from 'flowbite-svelte-icons';
+
+	type ButtonColorType =
+		| 'primary'
+		| 'dark'
+		| 'alternative'
+		| 'light'
+		| 'secondary'
+		| 'gray'
+		| 'red'
+		| 'orange'
+		| 'amber'
+		| 'yellow'
+		| 'lime'
+		| 'green'
+		| 'emerald'
+		| 'teal'
+		| 'cyan'
+		| 'sky'
+		| 'blue'
+		| 'indigo'
+		| 'violet'
+		| 'purple'
+		| 'fuchsia'
+		| 'pink'
+		| 'rose';
 
 	const socialProviders = $state([
 		{ name: 'GitHub', icon: GithubSolid, color: 'fuchsia', provider: 'github' },
-		{ name: 'Discord', icon: DiscordSolid, color: 'gray', provider: 'discord' },
-		{ name: 'LinkedIn', icon: LinkedinSolid, color: 'blue', provider: 'linkedin' }
+		{ name: 'Discord', icon: DiscordSolid, color: 'gray', provider: 'discord' }
 	]);
-
-	function signInWithSocial(provider: 'github' | 'discord' | 'linkedin') {
-		dispatch('socialSignIn', { provider });
-	}
-
-	const dispatch = createEventDispatcher();
 </script>
 
-<div class="social-media-registration">
+<div class="mt-3">
 	<Heading tag="h6" class="pt-0 text-[#0509f7] dark:text-[#0509f7]">Or sign up with:</Heading>
 	<div class="flex flex-col justify-center space-y-3">
 		{#each socialProviders as { name, icon: Icon, color, provider }}
 			<Button
-				size="small"
-				{color}
+				size="sm"
+				color={color as ButtonColorType}
 				class="flex w-full items-center py-1.5 opacity-70"
-				onclick={() => signInWithSocial(provider as 'github' | 'discord' | 'linkedin')}
+				href={`/auth/login/${provider}`}
 			>
 				<Icon class="mr-2 h-5 w-5" />
 				{name}
@@ -32,9 +49,3 @@
 		{/each}
 	</div>
 </div>
-
-<style>
-	.social-media-registration {
-		margin-top: 10px;
-	}
-</style>

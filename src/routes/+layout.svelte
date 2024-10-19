@@ -40,7 +40,6 @@
 	let closeDropdownUser = dropdownUser.close;
 	let toggleNav = nav.toggle;
 	let closeNav = nav.close;
-	let isUserSignedIn = $state(false);
 
 	$effect(() => {
 		dropdownUserStatus = dropdownUser.isOpen;
@@ -48,7 +47,13 @@
 	});
 
 	let { data, children }: Props = $props();
-	let { session, supabase } = $derived(data);
+	let { session, supabase, user } = $derived(data);
+
+	let avatarSrc = $state<string | null>(null);
+
+	$effect(() => {
+		avatarSrc = user?.user_metadata?.picture || null;
+	});
 
 	onMount(() => {
 		const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
@@ -77,34 +82,41 @@
 		{#snippet navSlotBlock()}
 			<div class="flex items-center space-x-1 md:order-2">
 				<Darkmode />
-				{#if !isUserSignedIn}
-					<Button href="/auth/signup" size="sm">Sign In</Button>
+				{#if !user}
+					<Button href="/auth/login" size="sm">Sign In</Button>
 				{:else}
-					<Avatar
-						onclick={dropdownUser.toggle}
-						src="/images/profile-picture-3.webp"
-						dot={{ color: 'green' }}
-					/>
+					{#if avatarSrc}
+						<Avatar
+							class="cursor-pointer"
+							onclick={dropdownUser.toggle}
+							src={user?.user_metadata?.picture}
+							dot={{ color: 'green' }}
+						/>
+					{:else}
+						<Avatar border dot={{ color: 'green' }} class="cursor-pointer" />
+					{/if}
 					<div class="relative">
 						<Dropdown
 							dropdownStatus={dropdownUserStatus}
 							closeDropdown={closeDropdownUser}
 							params={{ y: 0, duration: 200, easing: sineIn }}
-							class="absolute -left-[110px] top-[14px] md:-left-[160px] "
+							class="dropdown-content absolute right-0 top-[14px]"
 						>
 							<DropdownHeader class="px-4 py-2">
-								<span class="block text-sm text-gray-900 dark:text-white">Bonnie Green</span>
-								<span class="block truncate text-sm font-medium">name@flowbite.com</span>
+								<span class="block text-sm text-gray-900 dark:text-white"
+									>{user.user_metadata?.full_name || 'User'}</span
+								>
+								<span class="block truncate text-sm font-medium">{user.email}</span>
 							</DropdownHeader>
 							<DropdownUl>
-								<DropdownLi href="/">Dashboard</DropdownLi>
-								<DropdownLi href="/components/drawer">Drawer</DropdownLi>
-								<DropdownLi href="/components/footer">Footer</DropdownLi>
-								<DropdownLi href="/components">Alert</DropdownLi>
+								<DropdownLi href="/myprofile">My Profile</DropdownLi>
+								<DropdownLi href="/mydashboard">My Dashboard</DropdownLi>
+								<DropdownDivider />
+								<DropdownLi href="/auth/signout">Sign Out</DropdownLi>
 							</DropdownUl>
 							<DropdownFooter class="px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"
-								>Sign out</DropdownFooter
-							>
+								><span class="font-medium">Role: </span>{' '}{user.role}
+							</DropdownFooter>
 						</Dropdown>
 					</div>
 				{/if}
@@ -133,3 +145,19 @@
 		</div>
 	</Footer>
 </div>
+
+<style>
+	:global(.dropdown-content) {
+		min-width: max-content;
+		white-space: nowrap;
+	}
+
+	:global(.dropdown-content ul) {
+		width: 100%;
+	}
+
+	:global(.dropdown-content li) {
+		width: 100%;
+		box-sizing: border-box;
+	}
+</style>

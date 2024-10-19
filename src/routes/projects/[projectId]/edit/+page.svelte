@@ -2,8 +2,11 @@
 	import type { PageData } from './$types';
 
 	interface Props {
-		data?: PageData;
+		data: PageData;
+		children?: import('svelte').Snippet;
 	}
 
 	let { data }: Props = $props();
 </script>
+
+// TODO Project edit page

@@ -3,34 +3,34 @@
 	import { Button, Input, Heading } from 'svelte-5-ui-lib';
 	import EmailRegistrationInput from '$components/auth/EmailRegistrationInput.svelte';
 	import SocialMediaRegistrationInput from '$components/auth/SocialMediaRegistrationInput.svelte';
-	import UploadAvatar from '$components/UploadAvatar.svelte';
+	// import UploadAvatar from '$components/UploadAvatar.svelte';
 
 	import type { ActionData } from './$types';
 	import type { SubmitFunction } from '@sveltejs/kit';
 
 	interface FormData {
-		firstName: string;
-		lastName: string;
+		// firstName: string;
+		// lastName: string;
 		email: string;
 		password: string;
-		provider?: 'email' | 'github' | 'linkedin' | 'discord';
-		avatar: File | null;
+		provider?: 'email' | 'github' | 'discord';
+		// avatar: File | null;
 		errors: {
-			firstName?: string;
-			lastName?: string;
+			// firstName?: string;
+			// lastName?: string;
 			email?: string;
 			password?: string;
-			avatar?: string;
+			// avatar?: string;
 			general?: string;
 		};
 	}
 
 	interface FormErrors {
-		firstName?: string;
-		lastName?: string;
+		// firstName?: string;
+		// lastName?: string;
 		email?: string;
 		password?: string;
-		avatar?: string;
+		// avatar?: string;
 		general?: string;
 		[key: string]: string | undefined;
 	}
@@ -42,12 +42,12 @@
 	let { form = null }: Props = $props();
 
 	const formDefault: FormData = {
-		firstName: '',
-		lastName: '',
+		// firstName: '',
+		// lastName: '',
 		email: '',
 		password: '',
 		provider: 'email',
-		avatar: null,
+		// avatar: null,
 		errors: {}
 	};
 
@@ -81,14 +81,8 @@
 		formData.password = event.detail;
 	}
 
-	// function handleSocialSignIn(
-	// 	event: CustomEvent<{ provider: 'email' | 'github' | 'linkedin' | 'discord' | undefined }>
-	// ) {
-	// 	formData.provider = event.detail.provider;
-	// }
-
 	function handleSocialSignIn(
-		event: CustomEvent<{ provider: 'email' | 'github' | 'linkedin' | 'discord' | undefined }>
+		event: CustomEvent<{ provider: 'email' | 'github' | 'discord' | undefined }>
 	) {
 		const { provider } = event.detail;
 		formData.provider = provider;
@@ -99,9 +93,9 @@
 		}
 	}
 
-	function handleAvatarChange(newAvatar: File | null) {
-		formData.avatar = newAvatar;
-	}
+	// function handleAvatarChange(newAvatar: File | null) {
+	// 	formData.avatar = newAvatar;
+	// }
 
 	type FormErrorKey = keyof FormErrors;
 	let formErrors = $state<Partial<Record<FormErrorKey, string>>>({});
@@ -144,11 +138,11 @@
 	<form
 		id="registrationForm"
 		action="?/signup"
-		method="POST"
+		method="post"
 		enctype="multipart/form-data"
 		use:enhance={handleEnhance}
 	>
-		<Input
+		<!-- <Input
 			type="text"
 			class="my-1.5 w-full rounded-md border border-gray-300 p-2"
 			name="firstName"
@@ -172,20 +166,6 @@
 		/>
 		{#if formErrors.lastName}
 			<p class="text-sm text-red-500">{formErrors.lastName}</p>
-		{/if}
-		<!-- 
-		<EmailRegistrationInput
-			email={formData.email}
-			password={formData.password}
-			onValidationChange={handleValidationChange}
-			on:passwordChange={handlePasswordChange}
-		/>
-		<input type="hidden" name="password" bind:value={formData.password} />
-		{#if formErrors.email}
-			<p class="text-sm text-red-500">{formErrors.email}</p>
-		{/if}
-		{#if formErrors.password}
-			<p class="text-sm text-red-500">{formErrors.password}</p>
 		{/if} -->
 		{#if formData.provider === 'email'}
 			<EmailRegistrationInput
@@ -210,7 +190,7 @@
 		<SocialMediaRegistrationInput on:socialSignIn={handleSocialSignIn} />
 		<input type="hidden" name="provider" bind:value={formData.provider} />
 
-		<UploadAvatar
+		<!-- <UploadAvatar
 			firstName={formData.firstName}
 			lastName={formData.lastName}
 			avatar={formData.avatar}
@@ -218,7 +198,7 @@
 		/>
 		{#if formErrors.avatar}
 			<p class="text-sm text-red-500">{formErrors.avatar}</p>
-		{/if}
+		{/if} -->
 
 		<Button
 			type="submit"
