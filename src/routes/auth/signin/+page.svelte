@@ -104,6 +104,11 @@
 				</button>
 			{/snippet}</Input
 		>
+		<p class="text-center">
+			Forgot Password? <a href="/auth/reset/password" class="text-blue-500 hover:underline"
+				>Reset Password</a
+			>
+		</p>
 		<Button type="submit" disabled={!submissionValid} class="w-full">Log In</Button>
 	</form>
 
@@ -115,7 +120,7 @@
 					size="sm"
 					color={color as ButtonColorType}
 					class="flex w-full items-center py-1.5 opacity-70"
-					href={`/auth/login/${provider}`}
+					href={`/auth/signin/${provider}`}
 				>
 					<Icon class="mr-2 h-5 w-5" />
 					{name}

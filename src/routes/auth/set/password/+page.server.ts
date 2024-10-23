@@ -22,8 +22,14 @@ export const actions: Actions = {
 			});
 		}
 
+		// Get the user data to determine where to redirect
+		const {
+			data: { user }
+		} = await supabase.auth.getUser();
+
 		return {
-			success: true
+			success: true,
+			redirectTo: user ? `/profile/${user.id}` : '/profile'
 		};
 	}
 };

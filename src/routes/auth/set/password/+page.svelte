@@ -35,8 +35,20 @@
 			formErrors = {};
 
 			if (result.type === 'success') {
-				await goto('/dashboard');
-				return;
+				const data = result.data as { success: boolean; redirectTo?: string; message?: string };
+
+				if (data.success) {
+					if (data.message) {
+						// If there's a message, show it before redirecting
+						formErrors = { general: data.message };
+						loading = false;
+						return;
+					}
+
+					// Redirect to the specified route or fall back to profile
+					await goto(data.redirectTo || '/profile');
+					return;
+				}
 			}
 
 			if (result.type === 'failure') {
@@ -67,17 +79,16 @@
 	{/if}
 
 	<form id="setPasswordForm" action="?/setpassword" method="post" use:enhance={handleEnhance}>
+		<input type="hidden" name="password" value={formData.password} />
 		<PasswordSet
 			password={formData.password}
 			onValidationChange={handleValidationChange}
 			on:passwordChange={handlePasswordChange}
 			required={true}
 		/>
-
 		{#if formErrors.password}
 			<p class="text-sm text-red-500">{formErrors.password}</p>
 		{/if}
-
 		<Button
 			type="submit"
 			class="mt-2.5 w-full cursor-pointer rounded bg-blue-500 py-2.5 text-white hover:bg-blue-600"

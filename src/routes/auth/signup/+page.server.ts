@@ -84,22 +84,6 @@ export const actions: Actions = {
 					};
 				}
 				break;
-			case 'linkedin':
-				const { data: linkedinData, error: linkedinError } = await supabase.auth.signInWithOAuth({
-					provider: 'linkedin',
-					options: {
-						redirectTo: `${url.origin}/auth/callback`
-					}
-				});
-				if (linkedinError) {
-					return {
-						errors: {
-							email: 'Failed to sign in with LinkedIn'
-							// ... other error fields
-						}
-					};
-				}
-				break;
 			default:
 				return {
 					errors: {

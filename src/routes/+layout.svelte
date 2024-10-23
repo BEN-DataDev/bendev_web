@@ -21,15 +21,17 @@
 		Footer,
 		FooterLi,
 		FooterUl,
+		MegaMenu,
 		FooterCopyright
 	} from 'svelte-5-ui-lib';
 
-	import type { PageData } from './$types';
+	import type { LayoutData } from './$types';
 
 	import '../app.css';
+	import { ChevronDownOutline, MapLocationOutline } from 'flowbite-svelte-icons';
 
 	interface Props {
-		data: PageData;
+		data: LayoutData;
 		children?: import('svelte').Snippet;
 	}
 
@@ -41,19 +43,47 @@
 	let toggleNav = nav.toggle;
 	let closeNav = nav.close;
 
+	let megaMenuLeft = $state('0px');
+	let projectsNavLi: HTMLElement | null = null;
+
+	$effect(() => {
+		if (projectsNavLi && megaStatus) {
+			const rect = projectsNavLi.getBoundingClientRect();
+			megaMenuLeft = `${rect.left}px`;
+		}
+	});
+
 	$effect(() => {
 		dropdownUserStatus = dropdownUser.isOpen;
 		navStatus = nav.isOpen;
 	});
 
 	let { data, children }: Props = $props();
-	let { session, supabase, user } = $derived(data);
+	let { session, supabase, user, roles } = $derived(data);
 
 	let avatarSrc = $state<string | null>(null);
+	let mega = uiHelpers();
+	let megaStatus = $state(false);
+	const toggleProjects = mega.toggle;
 
 	$effect(() => {
 		avatarSrc = user?.user_metadata?.picture || null;
+		megaStatus = mega.isOpen;
 	});
+
+	let projects = [
+		{ name: 'About us', href: '/about', Icon: MapLocationOutline },
+		{ name: 'Blog', href: '/blog', Icon: MapLocationOutline },
+		{ name: 'Contact us', href: '/contact', Icon: MapLocationOutline },
+		{ name: 'Library', href: '/library', Icon: MapLocationOutline },
+		{ name: 'Newsletter', href: '/news', Icon: MapLocationOutline },
+		{ name: 'Support Center', href: '/support', Icon: MapLocationOutline },
+		{ name: 'Resources', href: '/resource', Icon: MapLocationOutline },
+		{ name: 'Playground', href: '/play', Icon: MapLocationOutline },
+		{ name: 'Terms', href: '/tersm', Icon: MapLocationOutline },
+		{ name: 'Pro Version', href: '/pro', Icon: MapLocationOutline },
+		{ name: 'License', href: '/license', Icon: MapLocationOutline }
+	];
 
 	onMount(() => {
 		const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
@@ -83,7 +113,7 @@
 			<div class="flex items-center space-x-1 md:order-2">
 				<Darkmode />
 				{#if !user}
-					<Button href="/auth/login" size="sm">Sign In</Button>
+					<Button href="/auth/signin" size="sm">Sign In</Button>
 				{:else}
 					{#if avatarSrc}
 						<Avatar
@@ -124,10 +154,33 @@
 		{/snippet}
 		<NavUl class="text-2xl">
 			<NavLi href="/">Home</NavLi>
-			<NavLi href="/components/navbar">Navbar</NavLi>
-			<NavLi href="/components/footer">Footer</NavLi>
+			<NavLi class="cursor-pointer" onclick={toggleProjects}>
+				<span bind:this={projectsNavLi}>
+					My Projects<ChevronDownOutline
+						class="ms-2 inline h-6 w-6 text-primary-800 dark:text-white"
+					/>
+				</span>
+			</NavLi>
 		</NavUl>
 	</Navbar>
+	<div class="relative">
+		<MegaMenu
+			items={projects}
+			dropdownStatus={megaStatus}
+			class="absolute top-[60px] w-[450px] bg-slate-200"
+			style="left: {megaMenuLeft};"
+		>
+			{#snippet children(prop)}
+				<a
+					href={prop.item.href}
+					class="flex items-center hover:text-primary-600 dark:hover:text-primary-500"
+				>
+					<prop.item.Icon class="me-2 h-4 w-4" />
+					{prop.item.name}
+				</a>
+			{/snippet}
+		</MegaMenu>
+	</div>
 	<main class="flex-1 overflow-y-auto">
 		{@render children?.()}
 	</main>

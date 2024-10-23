@@ -1,36 +1,26 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { Button, Input, Heading } from 'svelte-5-ui-lib';
+	import { Button, Heading } from 'svelte-5-ui-lib';
 	import EmailRegistrationInput from '$components/auth/EmailRegistrationInput.svelte';
 	import SocialMediaRegistrationInput from '$components/auth/SocialMediaRegistrationInput.svelte';
-	// import UploadAvatar from '$components/UploadAvatar.svelte';
 
 	import type { ActionData } from './$types';
 	import type { SubmitFunction } from '@sveltejs/kit';
 
 	interface FormData {
-		// firstName: string;
-		// lastName: string;
 		email: string;
 		password: string;
 		provider?: 'email' | 'github' | 'discord';
-		// avatar: File | null;
 		errors: {
-			// firstName?: string;
-			// lastName?: string;
 			email?: string;
 			password?: string;
-			// avatar?: string;
 			general?: string;
 		};
 	}
 
 	interface FormErrors {
-		// firstName?: string;
-		// lastName?: string;
 		email?: string;
 		password?: string;
-		// avatar?: string;
 		general?: string;
 		[key: string]: string | undefined;
 	}
@@ -42,12 +32,9 @@
 	let { form = null }: Props = $props();
 
 	const formDefault: FormData = {
-		// firstName: '',
-		// lastName: '',
 		email: '',
 		password: '',
 		provider: 'email',
-		// avatar: null,
 		errors: {}
 	};
 
@@ -86,16 +73,11 @@
 	) {
 		const { provider } = event.detail;
 		formData.provider = provider;
-		// Reset email and password when a social provider is selected
 		if (provider !== 'email') {
 			formData.email = '';
 			formData.password = '';
 		}
 	}
-
-	// function handleAvatarChange(newAvatar: File | null) {
-	// 	formData.avatar = newAvatar;
-	// }
 
 	type FormErrorKey = keyof FormErrors;
 	let formErrors = $state<Partial<Record<FormErrorKey, string>>>({});
@@ -130,11 +112,9 @@
 
 <div class="mx-auto my-2.5 w-[400px] rounded-lg bg-gray-300 p-5 shadow-md dark:bg-gray-400">
 	<Heading tag="h3" class="text-center text-[#0509f7] dark:text-[#0509f7]">Register</Heading>
-
 	{#if formErrors.general}
 		<p class="mb-4 text-red-500">{formErrors.general}</p>
 	{/if}
-
 	<form
 		id="registrationForm"
 		action="?/signup"
@@ -142,31 +122,6 @@
 		enctype="multipart/form-data"
 		use:enhance={handleEnhance}
 	>
-		<!-- <Input
-			type="text"
-			class="my-1.5 w-full rounded-md border border-gray-300 p-2"
-			name="firstName"
-			placeholder="First Name"
-			autocomplete="given-name"
-			required
-			bind:value={formData.firstName}
-		/>
-		{#if formErrors.firstName}
-			<p class="text-sm text-red-500">{formErrors.firstName}</p>
-		{/if}
-
-		<Input
-			type="text"
-			class="my-1.5 w-full rounded-md border border-gray-300 p-2"
-			name="lastName"
-			placeholder="Last Name"
-			autocomplete="family-name"
-			required
-			bind:value={formData.lastName}
-		/>
-		{#if formErrors.lastName}
-			<p class="text-sm text-red-500">{formErrors.lastName}</p>
-		{/if} -->
 		{#if formData.provider === 'email'}
 			<EmailRegistrationInput
 				email={formData.email}
@@ -189,17 +144,6 @@
 
 		<SocialMediaRegistrationInput on:socialSignIn={handleSocialSignIn} />
 		<input type="hidden" name="provider" bind:value={formData.provider} />
-
-		<!-- <UploadAvatar
-			firstName={formData.firstName}
-			lastName={formData.lastName}
-			avatar={formData.avatar}
-			on:change={(e) => handleAvatarChange(e.detail)}
-		/>
-		{#if formErrors.avatar}
-			<p class="text-sm text-red-500">{formErrors.avatar}</p>
-		{/if} -->
-
 		<Button
 			type="submit"
 			class="mt-2.5 w-full cursor-pointer rounded bg-blue-500 py-2.5 text-white hover:bg-blue-600"
