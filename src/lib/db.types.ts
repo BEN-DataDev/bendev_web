@@ -138,6 +138,7 @@ export type Database = {
           id: string
           last_updated: string
           name: string
+          public: boolean
         }
         Insert: {
           communityinfo?: Json | null
@@ -147,6 +148,7 @@ export type Database = {
           id?: string
           last_updated?: string
           name: string
+          public?: boolean
         }
         Update: {
           communityinfo?: Json | null
@@ -156,66 +158,9 @@ export type Database = {
           id?: string
           last_updated?: string
           name?: string
+          public?: boolean
         }
         Relationships: []
-      }
-      community_user_roles: {
-        Row: {
-          community_user_id: string
-          created_at: string
-          id: string
-          role: Database["public"]["Enums"]["user_community_role"]
-        }
-        Insert: {
-          community_user_id: string
-          created_at?: string
-          id?: string
-          role: Database["public"]["Enums"]["user_community_role"]
-        }
-        Update: {
-          community_user_id?: string
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["user_community_role"]
-        }
-        Relationships: [
-          {
-            foreignKeyName: "community_user_roles_community_user_id_fkey"
-            columns: ["community_user_id"]
-            isOneToOne: false
-            referencedRelation: "userprofile"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      project_user_roles: {
-        Row: {
-          created_at: string
-          id: string
-          project_user_id: string
-          role: Database["public"]["Enums"]["user_project_role"]
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          project_user_id: string
-          role: Database["public"]["Enums"]["user_project_role"]
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          project_user_id?: string
-          role?: Database["public"]["Enums"]["user_project_role"]
-        }
-        Relationships: [
-          {
-            foreignKeyName: "project_user_roles_project_user_id_fkey"
-            columns: ["project_user_id"]
-            isOneToOne: false
-            referencedRelation: "userprofile"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       projects: {
         Row: {
@@ -224,6 +169,7 @@ export type Database = {
           last_updated: string
           projectinfo: Json | null
           projectname: string
+          public: boolean
         }
         Insert: {
           created_at?: string
@@ -231,6 +177,7 @@ export type Database = {
           last_updated?: string
           projectinfo?: Json | null
           projectname: string
+          public?: boolean
         }
         Update: {
           created_at?: string
@@ -238,6 +185,7 @@ export type Database = {
           last_updated?: string
           projectinfo?: Json | null
           projectname?: string
+          public?: boolean
         }
         Relationships: []
       }
@@ -321,7 +269,7 @@ export type Database = {
       user_roles: {
         Row: {
           created_at: string
-          entity_id: string
+          entity_id: string | null
           id: string
           last_updated: string
           role_name: Database["public"]["Enums"]["role_name"]
@@ -330,7 +278,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          entity_id: string
+          entity_id?: string | null
           id?: string
           last_updated?: string
           role_name: Database["public"]["Enums"]["role_name"]
@@ -339,7 +287,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          entity_id?: string
+          entity_id?: string | null
           id?: string
           last_updated?: string
           role_name?: Database["public"]["Enums"]["role_name"]
@@ -394,6 +342,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      custom_access_token_hook: {
+        Args: {
+          event: Json
+        }
+        Returns: Json
+      }
       dev_download_crownlands: {
         Args: {
           use_get?: boolean
@@ -445,9 +399,6 @@ export type Database = {
         | "system_admin"
         | "system_moderator"
       role_type: "project" | "community" | "global"
-      system_role: "system_admin" | "system_moderator" | "system_user"
-      user_community_role: "owner" | "admin" | "moderator" | "member"
-      user_project_role: "owner" | "admin" | "editor" | "data_editor" | "viewer"
     }
     CompositeTypes: {
       [_ in never]: never

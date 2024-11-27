@@ -39,14 +39,11 @@
 
 				if (data.success) {
 					if (data.message) {
-						// If there's a message, show it before redirecting
 						formErrors = { general: data.message };
 						loading = false;
 						return;
 					}
-
-					// Redirect to the specified route or fall back to profile
-					await goto(data.redirectTo || '/profile');
+					await goto(data.redirectTo || '/users');
 					return;
 				}
 			}

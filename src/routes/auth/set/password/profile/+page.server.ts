@@ -1,4 +1,4 @@
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { generateAvatar } from '$lib/server';
 import type { Actions } from './$types';
 
@@ -16,7 +16,11 @@ function getAvatarColor(initials: string): string {
 }
 
 export const actions: Actions = {
-	setpasswordprofile: async ({ request, locals: { supabase } }) => {
+	setpasswordprofile: async ({ request, locals: { supabase, safeGetSession } }) => {
+		const session = await safeGetSession();
+		if (!session) {
+			return fail(401, { success: false, errors: { general: 'Unauthorized' } });
+		}
 		const formData = await request.formData();
 		const firstName = formData.get('firstName') as string;
 		const lastName = formData.get('lastName') as string;
@@ -68,7 +72,7 @@ export const actions: Actions = {
 				errors: { firstName: 'Last Name is required' }
 			});
 		}
-		const { error } = await supabase.auth.updateUser({
+		const { data, error } = await supabase.auth.updateUser({
 			password,
 			data: { firstName: firstName, lastName: lastName, picture: picture }
 		});
@@ -79,7 +83,8 @@ export const actions: Actions = {
 			});
 		}
 		return {
-			success: true
+			success: true,
+			redirectTo: session?.user ? `/users/[${session.user.id}]/dashboard` : '/users'
 		};
 	}
 };

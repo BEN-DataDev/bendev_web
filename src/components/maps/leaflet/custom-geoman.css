@@ -1,0 +1,29 @@
+/* .leaflet-bar .leaflet-pm-icon-text {
+	background-image: url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTAgMTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+DQogIDxjaXJjbGUgY3g9IjUiIGN5PSI1IiByPSI0IiBmaWxsPSIjMDAwMEZGIiAvPg0KPC9zdmc+DQo=);
+} */
+.leaflet-pm-toolbar-collapse-btn {
+    cursor: pointer;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    padding: 2px 5px;
+    margin-bottom: 5px;
+}
+
+.leaflet-pm-toolbar {
+    transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+    max-height: 1000px;
+    /* Adjust based on your toolbar height */
+    opacity: 1;
+    overflow: hidden;
+}
+
+.leaflet-pm-toolbar.collapsed {
+    max-height: 30px;
+    /* Height of the collapse button */
+    opacity: 0.7;
+}
+
+.leaflet-pm-toolbar.collapsed .button-container {
+    display: none;
+}

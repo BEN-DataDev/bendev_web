@@ -25,7 +25,7 @@ export const actions: Actions = {
 			});
 		}
 		if (data.user) {
-			redirect(303, `/profile/${data.user.id}`);
+			redirect(303, `/users/[${data.user.id}]/dashboard`);
 		} else {
 			redirect(303, '/auth/auth-error');
 		}

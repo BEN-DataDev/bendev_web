@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { Heading, Toast } from 'svelte-5-ui-lib';
-	import { CheckCircleSolid, XCircleSolid } from 'flowbite-svelte-icons';
+	import { CheckCircleSolid, CloseCircleSolid } from 'flowbite-svelte-icons';
 	import { linear } from 'svelte/easing';
 	import { fade } from 'svelte/transition';
 
@@ -69,7 +69,7 @@
 			{#if toastProps.status === 'success'}
 				<CheckCircleSolid />
 			{:else}
-				<XCircleSolid />
+				<CloseCircleSolid />
 			{/if}
 		{/snippet}
 		<Toast
@@ -84,7 +84,9 @@
 		>
 			<div class="mt-3 flex items-center">
 				<div class="ms-3">
-					<h4 class="text-sm font-semibold text-gray-900 dark:text-white">{toastProps.message}</h4>
+					<h4 class="text-sm font-semibold text-text-900 dark:text-text-100">
+						{toastProps.message}
+					</h4>
 				</div>
 			</div></Toast
 		>
@@ -92,17 +94,19 @@
 {/if}
 
 <div
-	class="mx-auto h-full w-full rounded-lg bg-gray-300 p-5 py-2.5 shadow-md sm:w-[95%] md:w-[90%] lg:w-[80%] dark:bg-gray-400"
+	class="mx-auto h-full w-full rounded-lg bg-surface-100 p-5 py-2.5 shadow-md sm:w-[95%] md:w-[90%] lg:w-[80%] dark:bg-fill-400"
 >
-	<Heading tag="h1" class="text-center text-[#0509f7] dark:text-[#0509f7]"
+	<Heading tag="h1" class="text-center text-tertiary-900 dark:text-tertiary-700"
 		>Welcome to the Batlow Environment Network</Heading
 	>
-	<Heading tag="h2" class="text-center text-blue-600">Community Information Infrastructure</Heading>
-	<p class="text-center text-xl text-gray-800">
+	<Heading tag="h2" class="text-center text-tertiary-900 dark:text-tertiary-700"
+		>Community Information Infrastructure</Heading
+	>
+	<p class="text-center text-xl text-text-800">
 		Empowering neighborhoods with data-driven resilience
 	</p>
 
-	<div class="container mx-auto rounded-lg bg-white p-8 px-4 py-8 shadow-lg">
+	<div class="container mx-auto rounded-lg bg-fill-100 p-8 px-4 py-8 shadow-lg">
 		<div class="prose lg:prose-xl mx-auto">
 			<p class="mb-4">
 				Imagine empowering communities with their own digital nervous system - a Community
@@ -116,7 +120,7 @@
 				challenges. It's not just about information; it's about transformation - turning fragmented
 				neighborhoods into cohesive, responsive communities equipped for the future.
 			</p>
-			<p class="text-center font-bold text-blue-600">
+			<p class="text-center font-bold text-tertiary-900 dark:text-tertiary-700">
 				Join us in building stronger, smarter, and more resilient communities from the ground up.
 			</p>
 		</div>

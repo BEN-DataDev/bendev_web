@@ -1,26 +1,10 @@
 import { redirect, fail } from '@sveltejs/kit';
 
-import { generateAvatar } from '$lib/server';
 import type { Actions } from './$types';
-
-function getInitials(firstName: string, lastName: string): string {
-	return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
-}
-
-function getAvatarColor(initials: string): string {
-	let hash = 0;
-	for (let i = 0; i < initials.length; i++) {
-		hash = initials.charCodeAt(i) + ((hash << 5) - hash);
-	}
-	const hue = hash % 360;
-	return `hsl(${hue}, 70%, 60%)`;
-}
 
 export const actions: Actions = {
 	signup: async ({ url, request, locals: { supabase } }) => {
 		const formData = await request.formData();
-		// const firstName = formData.get('firstName') as string;
-		// const lastName = formData.get('lastName') as string;
 		const email = formData.get('email') as string;
 		const password = formData.get('password') as string;
 		const provider = formData.get('provider') as string;
@@ -51,7 +35,7 @@ export const actions: Actions = {
 				const { data: githubData, error: githubError } = await supabase.auth.signInWithOAuth({
 					provider: 'github',
 					options: {
-						redirectTo: `${url.origin}/authorised/profile`
+						redirectTo: `${url.origin}/users`
 					}
 				});
 				if (githubError) {

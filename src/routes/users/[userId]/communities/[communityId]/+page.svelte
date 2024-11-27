@@ -8,5 +8,3 @@
 
 	let { data }: Props = $props();
 </script>
-
-// TODO Users profile

@@ -30,7 +30,7 @@
 	{#if verified}
 		<h1>Email Verified!</h1>
 		<p>Your email has been successfully verified.</p>
-		<button onclick={() => goto('/authorised/profile')}>Continue to Dashboard</button>
+		<button onclick={() => goto(`/users/[{user.id}]/dasboard`)}>Continue to Dashboard</button>
 	{:else}
 		<h1>Please verify your email</h1>
 		<p>Check your inbox and click the verification link we sent you.</p>

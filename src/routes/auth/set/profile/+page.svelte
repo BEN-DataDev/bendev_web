@@ -38,9 +38,17 @@
 			loading = true;
 			formErrors = {};
 			if (result.type === 'success') {
-				await invalidate('app:root');
-				await goto('/authorised/profile');
-				return;
+				const data = result.data as { success: boolean; redirectTo?: string; message?: string };
+
+				if (data.success) {
+					if (data.message) {
+						formErrors = { general: data.message };
+						loading = false;
+						return;
+					}
+					await goto(data.redirectTo || '/users');
+					return;
+				}
 			}
 			if (result.type === 'failure') {
 				const data = result.data as ActionData;

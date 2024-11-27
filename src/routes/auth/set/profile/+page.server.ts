@@ -16,7 +16,11 @@ function getAvatarColor(initials: string): string {
 }
 
 export const actions: Actions = {
-	setprofile: async ({ request, locals: { supabase } }) => {
+	setprofile: async ({ request, locals: { supabase, safeGetSession } }) => {
+		const session = await safeGetSession();
+		if (!session) {
+			return fail(401, { success: false, errors: { general: 'Unauthorized' } });
+		}
 		const formData = await request.formData();
 		const firstName = formData.get('firstName') as string;
 		const lastName = formData.get('lastName') as string;
@@ -68,7 +72,8 @@ export const actions: Actions = {
 			});
 		}
 		return {
-			success: true
+			success: true,
+			redirectTo: session?.user ? `/users/[${session.user.id}]/dashboard` : '/users'
 		};
 	}
 };

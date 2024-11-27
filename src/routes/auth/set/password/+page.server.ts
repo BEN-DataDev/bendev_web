@@ -29,7 +29,7 @@ export const actions: Actions = {
 
 		return {
 			success: true,
-			redirectTo: user ? `/profile/${user.id}` : '/profile'
+			redirectTo: user ? `/users/[${user.id}]/dashboard` : '/users'
 		};
 	}
 };

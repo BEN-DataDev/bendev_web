@@ -29,7 +29,11 @@ function parseUserRolesFromJWT(accessToken: string) {
 
 		// Decode the payload (second part of the token)
 		const payload = JSON.parse(
-			decodeURIComponent(escape(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'))))
+			new TextDecoder().decode(
+				Uint8Array.from(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')), (c) =>
+					c.charCodeAt(0)
+				)
+			)
 		);
 
 		// Check if user_roles exists in the payload

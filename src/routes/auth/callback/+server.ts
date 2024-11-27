@@ -39,12 +39,12 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
 		}
 
 		// For signup, we need to get the user ID after verification
-		if (type === 'signup' && next === '/auth/callback/redirect-to/profile') {
+		if (type === 'signup' && next === '/auth/callback/redirect-to/user') {
 			const {
 				data: { user }
 			} = await supabase.auth.getUser();
 			if (user) {
-				return redirect(303, `/profile/${user.id}`);
+				return redirect(303, `/users/[${user.id}]/dashboard`);
 			}
 		}
 
@@ -61,7 +61,7 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
 			return redirect(303, '/auth/auth-code-error');
 		}
 		if (data.user) {
-			return redirect(303, `/profile/${data.user.id}`);
+			return redirect(303, `/users/[${data.user.id}]/dashboard`);
 		}
 	}
 

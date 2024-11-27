@@ -13,7 +13,7 @@ export const GET: RequestHandler = async ({ locals: { supabase, safeGetSession }
 	} = await supabase.auth.getUser();
 
 	if (user) {
-		return redirect(303, `/profile/${user.id}`);
+		return redirect(303, `/users/[${user.id}]/dashboard`);
 	} else {
 		return redirect(303, '/auth/auth-verify-error');
 	}

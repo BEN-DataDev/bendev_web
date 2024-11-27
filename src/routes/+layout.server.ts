@@ -17,7 +17,7 @@ export const load: LayoutServerLoad = async ({ locals: { safeGetSession, supabas
 	return {
 		session: {},
 		user,
-		roles: [],
+		roles: '',
 		cookies: cookies.getAll()
 	};
 };
