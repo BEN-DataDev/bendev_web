@@ -4,7 +4,7 @@ import { PRIVATE_SUPABASE_SERVICE_ROLE_KEY } from '$env/static/private';
 import type { RequestHandler } from './$types';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient('PUBLIC_SUPABASE_URL', 'PRIVATE_SUPABASE_SERVICE_ROLE_KEY');
+const supabase = createClient(PUBLIC_SUPABASE_URL, PRIVATE_SUPABASE_SERVICE_ROLE_KEY);
 
 // Make sure to export the POST handler
 export const POST: RequestHandler = async ({ request }) => {
