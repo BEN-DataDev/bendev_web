@@ -54,6 +54,9 @@ function parseUserRolesFromJWT(accessToken: string) {
 }
 
 const supabase: Handle = async ({ event, resolve }) => {
+	if (event.url.pathname === '/api/cron') {
+		return await resolve(event);
+	}
 	/**
 	 * Creates a Supabase client specific to this server request.
 	 *
