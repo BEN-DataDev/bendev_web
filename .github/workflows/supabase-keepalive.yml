@@ -1,0 +1,15 @@
+name: Supabase Keepalive
+
+on:
+  schedule:
+    - cron: '0 0 */4 * *'  # Runs at midnight UTC on days 1, 5, 9, 13, etc.
+  workflow_dispatch:  # Allows manual trigger for testing
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Edge Function
+        run: |
+          curl -f -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            ${{ secrets.SUPABASE_FUNCTION_URL }}
