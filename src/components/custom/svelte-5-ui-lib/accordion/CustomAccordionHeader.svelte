@@ -12,9 +12,13 @@
 
 	let openStates = $state<Record<string, boolean>>({});
 
-	// Initialize states
-	items.forEach((item) => {
-		openStates[item.id] = item.isOpen ?? false;
+	// Initialize states reactively
+	$effect(() => {
+		items.forEach((item) => {
+			if (!(item.id in openStates)) {
+				openStates[item.id] = item.isOpen ?? false;
+			}
+		});
 	});
 
 	function handleToggle(

@@ -69,7 +69,7 @@
 
 	let leaflet: typeof L;
 	let leafletMap: L.Map;
-	let layersStore: Writable<Record<string, LayerInfo>>;
+	let layersStore: Writable<Record<string, LayerInfo>> = getLeafletLayers();
 
 	function createLayerControls(layerId: string, layerName: string) {
 		const actions = ['Add', 'Edit', 'Delete'];

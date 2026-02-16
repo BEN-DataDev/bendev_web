@@ -12,8 +12,8 @@
 	let leftSidebarOpen = $state(true);
 	let rightSidebarOpen = $state(true);
 
-	let { data }: Props = $props();
-	const userId = data.user?.id;
+	let { data, children }: Props = $props();
+	let userId = $derived(data.user?.id);
 </script>
 
 <ResponsiveLayout
@@ -43,4 +43,6 @@
 			</div>
 		</div>
 	{/snippet}
+
+	{@render children?.()}
 </ResponsiveLayout>

@@ -78,9 +78,9 @@
 		opacity: 1
 	};
 
-	const mapConfig = {
-		centre: data.communities[0].centre as [number, number],
-		bounds: data.communities[0].bounds as [[number, number], [number, number]],
+	let mapConfig = $derived({
+		centre: data.communities[0]?.centre as [number, number],
+		bounds: data.communities[0]?.bounds as [[number, number], [number, number]],
 		minZoom: undefined,
 		maxZoom: undefined,
 		zoomable: true,
@@ -92,7 +92,7 @@
 		width: '100%',
 		height: '99%',
 		baseLayers: baseLayers
-	};
+	});
 	let currentCommunity = $derived(
 		data.communities.find((c: { id: string | null }) => c.id === selectedCommunity)
 	);

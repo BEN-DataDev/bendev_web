@@ -6,5 +6,7 @@
 		children?: import('svelte').Snippet;
 	}
 
-	let { data }: Props = $props();
+	let { data, children }: Props = $props();
 </script>
+
+{@render children?.()}

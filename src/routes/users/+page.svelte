@@ -13,9 +13,9 @@
 	let leftSidebarOpen = $state(true);
 	let rightSidebarOpen = $state(true);
 
-	let { data }: Props = $props();
+	let { data, children }: Props = $props();
 	let pathName = $derived($page.url.pathname);
-	const userId = data.user?.id;
+	let userId = $derived(data.user?.id);
 	$effect(() => {
 		console.log('users/[{userId}]/layout.svelte', pathName);
 	});
@@ -61,4 +61,6 @@
 			</div>
 		</div>
 	{/snippet}
+
+	{@render children?.()}
 </ResponsiveLayout>
