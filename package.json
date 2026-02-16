@@ -10,7 +10,8 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
-		"update-db-types": "npx supabase gen types typescript --project-id \"egmkrlzmtxioijlhfgqn\" > src/lib/db.types.ts"
+		"update-db-types": "npx supabase gen types typescript --project-id \"$SUPABASE_PROJECT_REF\" > src/lib/db.types.ts",
+		"update-db-types-local": "npx supabase gen types --local --lang=typescript --schema public > src/lib/db.types.ts"
 	},
 	"devDependencies": {
 		"@geoman-io/leaflet-geoman-free": "^2.17.0",
@@ -37,6 +38,7 @@
 		"prettier": "^3.3.3",
 		"prettier-plugin-svelte": "^3.2.7",
 		"prettier-plugin-tailwindcss": "^0.6.8",
+		"supabase": "^2.76.8",
 		"svelte": "^5.1.0",
 		"svelte-5-ui-lib": "^0.10.0",
 		"svelte-check": "^4.0.5",

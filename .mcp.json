@@ -20,7 +20,7 @@
 		},
 		"project-design": {
 			"command": "npx",
-			"args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/akeown/projects/ai/ai-dev-system/projects/bendev_web"]
+			"args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/akeown/projects/ai/ai-dev-system/projects/bendev-web"]
 		},
 		"github": {
 			"command": "npx",

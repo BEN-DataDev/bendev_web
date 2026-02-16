@@ -7,11 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
-  }
   public: {
     Tables: {
       comments: {
@@ -182,32 +177,199 @@ export type Database = {
         }
         Relationships: []
       }
-      projects: {
+      keepalive: {
+        Row: {
+          id: number
+          last_ping: string | null
+        }
+        Insert: {
+          id?: number
+          last_ping?: string | null
+        }
+        Update: {
+          id?: number
+          last_ping?: string | null
+        }
+        Relationships: []
+      }
+      project_attachments: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          file_name: string
+          file_path: string
+          file_size: number | null
+          file_type: string
+          id: string
+          last_updated: string
+          project_id: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          file_type: string
+          id?: string
+          last_updated?: string
+          project_id: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          file_type?: string
+          id?: string
+          last_updated?: string
+          project_id?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_attachments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_attachments_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "userprofile"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_layers: {
         Row: {
           created_at: string
+          created_by: string | null
+          description: string | null
+          display_order: number
+          editable: boolean
+          geojson_data: Json | null
+          id: string
+          last_updated: string
+          layer_type: string
+          name: string
+          project_id: string
+          source_url: string | null
+          style: Json | null
+          visible: boolean
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          display_order?: number
+          editable?: boolean
+          geojson_data?: Json | null
+          id?: string
+          last_updated?: string
+          layer_type: string
+          name: string
+          project_id: string
+          source_url?: string | null
+          style?: Json | null
+          visible?: boolean
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          display_order?: number
+          editable?: boolean
+          geojson_data?: Json | null
+          id?: string
+          last_updated?: string
+          layer_type?: string
+          name?: string
+          project_id?: string
+          source_url?: string | null
+          style?: Json | null
+          visible?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_layers_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "userprofile"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_layers_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          bounds: unknown
+          community_id: string | null
+          created_at: string
+          description: string | null
+          end_date: string | null
+          geometry: unknown
           id: string
           last_updated: string
           projectinfo: Json | null
           projectname: string
           public: boolean
+          start_date: string | null
+          status: string | null
         }
         Insert: {
+          bounds?: unknown
+          community_id?: string | null
           created_at?: string
+          description?: string | null
+          end_date?: string | null
+          geometry?: unknown
           id?: string
           last_updated?: string
           projectinfo?: Json | null
           projectname: string
           public?: boolean
+          start_date?: string | null
+          status?: string | null
         }
         Update: {
+          bounds?: unknown
+          community_id?: string | null
           created_at?: string
+          description?: string | null
+          end_date?: string | null
+          geometry?: unknown
           id?: string
           last_updated?: string
           projectinfo?: Json | null
           projectname?: string
           public?: boolean
+          start_date?: string | null
+          status?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "projects_community_id_fkey"
+            columns: ["community_id"]
+            isOneToOne: false
+            referencedRelation: "community"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       projects_tables: {
         Row: {
@@ -362,66 +524,54 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      custom_access_token_hook: {
-        Args: { event: Json }
-        Returns: Json
-      }
+      custom_access_token_hook: { Args: { event: Json }; Returns: Json }
       dev_download_crownlands: {
-        Args: { use_get?: boolean; delay_seconds?: number }
+        Args: { delay_seconds?: number; use_get?: boolean }
         Returns: Json
       }
       dev_process_downloads: {
-        Args: { use_get?: boolean; delay_seconds?: number }
+        Args: { delay_seconds?: number; use_get?: boolean }
         Returns: Json
       }
       get_communities_with_transformed_extent: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
-          id: string
-          extent: unknown
-          extent_center: number[]
-          extent_bounds: number[]
-          name: string
-          contactinfo: Json
           communityinfo: Json
+          contactinfo: Json
           created_at: string
+          extent: unknown
+          extent_bounds: number[]
+          extent_center: number[]
+          id: string
           last_updated: string
+          name: string
           public: boolean
         }[]
       }
       get_community_with_transformed_extent: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
-          id: string
-          extent: unknown
-          name: string
-          contactinfo: Json
           communityinfo: Json
+          contactinfo: Json
           created_at: string
+          extent: unknown
+          id: string
           last_updated: string
+          name: string
           public: boolean
         }[]
       }
-      get_user_roles: {
-        Args: { user_id: string }
-        Returns: Json
-      }
-      health_check: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
+      get_user_roles: { Args: { user_id: string }; Returns: Json }
+      health_check: { Args: never; Returns: Json }
       remove_user_from_community: {
-        Args: { p_userid: string; p_communityid: string }
+        Args: { p_communityid: string; p_userid: string }
         Returns: undefined
       }
       remove_user_from_project: {
-        Args: { p_userid: string; p_projectid: string }
+        Args: { p_projectid: string; p_userid: string }
         Returns: undefined
       }
-      sync_existing_users: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      sync_existing_users: { Args: never; Returns: undefined }
     }
     Enums: {
       role_name:
@@ -577,3 +727,4 @@ export const Constants = {
     },
   },
 } as const
+

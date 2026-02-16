@@ -25,7 +25,7 @@ port = 54322
 shadow_port = 54320
 # The database major version to use. This has to be the same as your remote database's. Run `SHOW
 # server_version;` on the remote database to check.
-major_version = 15
+major_version = 17
 
 [db.pooler]
 enabled = false
@@ -130,19 +130,19 @@ max_frequency = "1s"
 
 [auth.email.template.invite]
 subject = "Your Invitation to Our App"
-content_path = "./email_templates/invite.html"
+content_path = "./supabase/email_templates/invite.html"
 
 [auth.email.template.magic_link]
 subject = "Sign in to Your Account"
-content_path = "./email_templates/magic_link.html"
+content_path = "./supabase/email_templates/magic_link.html"
 
 [auth.email.template.recovery]
 subject = "Reset Your Password"
-content_path = "./email_templates/recovery.html"
+content_path = "./supabase/email_templates/recovery.html"
 
 [auth.email.template.verify]
 subject = "Verify Your Email Address"
-content_path = "./email_templates/verify.html"
+content_path = "./supabase/email_templates/verify.html"
 
 [auth.sms]
 # Allow/disallow new user signups via SMS to your project.
