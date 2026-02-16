@@ -1,41 +1,7 @@
 import { createBrowserClient, createServerClient, isBrowser } from '@supabase/ssr';
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public';
+import { parseUserRolesFromJWT, type UserRole } from '$lib/roles';
 import type { LayoutLoad } from './$types';
-
-function parseUserRolesFromJWT(accessToken: string) {
-	if (!accessToken) {
-		console.error('Access token is empty or undefined');
-		return [];
-	}
-
-	try {
-		const parts = accessToken.split('.');
-		if (parts.length !== 3) {
-			console.error('Invalid JWT format');
-			return [];
-		}
-
-		// Decode the payload (second part of the token)
-		const payload = JSON.parse(
-			decodeURIComponent(escape(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'))))
-		);
-
-		// Check if user_roles exists in the payload
-		if (payload.user_roles && Array.isArray(payload.user_roles)) {
-			return payload.user_roles.map((role: { entity_id: any; role_name: any; role_type: any }) => ({
-				entity_id: role.entity_id,
-				role_name: role.role_name,
-				role_type: role.role_type
-			}));
-		} else {
-			console.warn('No user_roles found in JWT payload');
-			return [];
-		}
-	} catch (error) {
-		console.error('Error parsing JWT:', error);
-		return [];
-	}
-}
 
 export const load: LayoutLoad = async ({ data, depends, fetch }) => {
 	/**
@@ -75,7 +41,7 @@ export const load: LayoutLoad = async ({ data, depends, fetch }) => {
 		data: { user }
 	} = await supabase.auth.getUser();
 
-	let roles = [];
+	let roles: UserRole[] = [];
 	if (session?.access_token) {
 		roles = parseUserRolesFromJWT(session.access_token);
 	} else {

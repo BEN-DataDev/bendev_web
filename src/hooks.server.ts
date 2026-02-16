@@ -3,55 +3,7 @@ import { type Handle, redirect } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
-
-// function parseUserRolesFromJWT(accessToken: string) {
-// 	try {
-// 		const payload = JSON.parse(Buffer.from(accessToken.split('.')[1], 'base64').toString());
-// 		return payload.user_roles || [];
-// 	} catch (error) {
-// 		console.error('Error parsing JWT:', error);
-// 		return [];
-// 	}
-// }
-
-function parseUserRolesFromJWT(accessToken: string) {
-	if (!accessToken) {
-		console.error('Access token is empty or undefined');
-		return [];
-	}
-
-	try {
-		const parts = accessToken.split('.');
-		if (parts.length !== 3) {
-			console.error('Invalid JWT format');
-			return [];
-		}
-
-		// Decode the payload (second part of the token)
-		const payload = JSON.parse(
-			new TextDecoder().decode(
-				Uint8Array.from(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')), (c) =>
-					c.charCodeAt(0)
-				)
-			)
-		);
-
-		// Check if user_roles exists in the payload
-		if (payload.user_roles && Array.isArray(payload.user_roles)) {
-			return payload.user_roles.map((role: { entity_id: any; role_name: any; role_type: any }) => ({
-				entity_id: role.entity_id,
-				role_name: role.role_name,
-				role_type: role.role_type
-			}));
-		} else {
-			console.warn('No user_roles found in JWT payload');
-			return [];
-		}
-	} catch (error) {
-		console.error('Error parsing JWT:', error);
-		return [];
-	}
-}
+import { parseUserRolesFromJWT } from '$lib/roles';
 
 const supabase: Handle = async ({ event, resolve }) => {
 	if (event.url.pathname === '/api/cron') {

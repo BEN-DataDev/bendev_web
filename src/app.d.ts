@@ -1,4 +1,5 @@
 import type { Session, SupabaseClient, User } from '@supabase/supabase-js';
+import type { UserRole } from '$lib/roles';
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
 declare global {

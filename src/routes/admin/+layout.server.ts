@@ -1,7 +1,7 @@
+import { requireGlobalAdmin } from '$lib/server/auth';
 import type { LayoutServerLoad } from './$types';
 
-export const load = (async () => {
+export const load = (async ({ locals }) => {
+	await requireGlobalAdmin(locals);
 	return {};
 }) satisfies LayoutServerLoad;
-
-// TODO Check admin role for all admin routes
