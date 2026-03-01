@@ -1,51 +1,25 @@
 <script lang="ts">
-	import { Button, Heading } from 'svelte-5-ui-lib';
-	import { GithubSolid, DiscordSolid } from 'flowbite-svelte-icons';
+	import Icon from '$components/icons/Icons.svelte';
 
-	type ButtonColorType =
-		| 'primary'
-		| 'dark'
-		| 'alternative'
-		| 'light'
-		| 'secondary'
-		| 'gray'
-		| 'red'
-		| 'orange'
-		| 'amber'
-		| 'yellow'
-		| 'lime'
-		| 'green'
-		| 'emerald'
-		| 'teal'
-		| 'cyan'
-		| 'sky'
-		| 'blue'
-		| 'indigo'
-		| 'violet'
-		| 'purple'
-		| 'fuchsia'
-		| 'pink'
-		| 'rose';
+	type IconName = 'github' | 'moon' | 'sun' | 'user' | 'menu' | 'x' | 'eye' | 'eye-off' | 'circle-check' | 'circle-x' | 'chevrons-left' | 'chevrons-right' | 'chevrons-up' | 'chevrons-down' | 'settings' | 'user-circle' | 'users';
 
-	const socialProviders = $state([
-		{ name: 'GitHub', icon: GithubSolid, color: 'fuchsia', provider: 'github' },
-		{ name: 'Discord', icon: DiscordSolid, color: 'gray', provider: 'discord' }
+	const socialProviders = $state<Array<{ name: string; iconName: IconName; provider: string }>>([
+		{ name: 'GitHub', iconName: 'github' as IconName, provider: 'github' }
+		// TODO: Add Discord, Google, Microsoft icons when implementing social auth UI
 	]);
 </script>
 
 <div class="mt-3">
-	<Heading tag="h6" class="pt-0 text-[#0509f7] dark:text-[#0509f7]">Or sign up with:</Heading>
+	<h6 class="h6 pt-0 text-primary-600 dark:text-primary-400">Or sign up with:</h6>
 	<div class="flex flex-col justify-center space-y-3">
-		{#each socialProviders as { name, icon: Icon, color, provider }}
-			<Button
-				size="sm"
-				color={color as ButtonColorType}
-				class="flex w-full items-center py-1.5 opacity-70"
-				href={`/auth/login/${provider}`}
+		{#each socialProviders as { name, iconName, provider }}
+			<a
+				class="btn preset-filled-secondary-500 flex w-full items-center justify-center py-1.5 text-sm opacity-70 hover:opacity-100"
+				href={`/auth/signin/${provider}`}
 			>
-				<Icon class="mr-2 h-5 w-5" />
+				<Icon name={iconName} class="mr-2 h-5 w-5" />
 				{name}
-			</Button>
+			</a>
 		{/each}
 	</div>
 </div>

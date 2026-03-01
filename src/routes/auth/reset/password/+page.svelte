@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { SubmitFunction } from '@sveltejs/kit';
-	import { Button, Input, Label } from 'svelte-5-ui-lib';
-	import Heading from 'svelte-5-ui-lib/Heading.svelte';
+	
+	// Migrated to native heading elements
 
 	let email = $state('');
 	let message = $state('');
@@ -32,13 +32,13 @@
 	<title>Password Reset Form</title>
 </svelte:head>
 
-<div class="mx-auto my-2.5 w-[400px] rounded-lg bg-gray-300 p-5 shadow-md dark:bg-gray-400">
-	<Heading tag="h3" class="text-center text-[#0509f7] dark:text-[#0509f7]">Password Reset</Heading>
+<div class="card preset-outlined-surface-200-800 mx-auto my-2.5 w-[400px] p-5 shadow-md">
+	<h3 class="h3 text-center text-primary-600 dark:text-primary-400">Password Reset</h3>
 	{#if message}
-		<p class="success">{message}</p>
+		<p class="text-success-500">{message}</p>
 	{/if}
 	{#if error}
-		<p class="error">{error}</p>
+		<p class="text-error-500">{error}</p>
 	{/if}
 	<form
 		id="requestResetPasswordForm"
@@ -47,21 +47,21 @@
 		enctype="multipart/form-data"
 		use:enhance={handleEnhance}
 	>
-		<Input
+		<input
 			type="email"
-			class="my-1.5 w-full rounded-md border border-gray-300 p-2"
+			class="input my-1.5 w-full rounded-md border border-surface-300 dark:border-surface-600 bg-surface-50 dark:bg-surface-900 p-2"
 			name="email"
 			placeholder="Email"
 			autocomplete="email"
-			required={true}
+			required
 			bind:value={email}
 		/>
-		<Button
+		<button
 			type="submit"
-			class="mt-2.5 w-full cursor-pointer rounded bg-blue-500 py-2.5 text-white hover:bg-blue-600"
+			class="btn preset-filled-primary-500 mt-2.5 w-full cursor-pointer"
 			disabled={email === ''}
 		>
-			{'Request Password Reset'}
-		</Button>
+			Request Password Reset
+		</button>
 	</form>
 </div>

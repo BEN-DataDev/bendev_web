@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { Heading, Toast } from 'svelte-5-ui-lib';
-	import { CheckCircleSolid, CloseCircleSolid } from 'flowbite-svelte-icons';
+	// Migrated to native toast implementation
+	import Icon from '$components/icons/Icons.svelte';
 	import { linear } from 'svelte/easing';
 	import { fade } from 'svelte/transition';
 
@@ -64,45 +64,43 @@
 </script>
 
 {#if showToast && toastProps}
-	<div transition:fade={{ duration: 300 }}>
-		{#snippet icon()}
+	<div
+		class="fixed {toastProps.position === 'bottom-right' ? 'bottom-4 right-4' : toastProps.position === 'top-right' ? 'top-4 right-4' : toastProps.position === 'bottom-left' ? 'bottom-4 left-4' : 'top-4 left-4'} z-50 flex items-center gap-3 rounded-lg p-4 shadow-lg {getToastClasses(toastProps.status)}"
+		transition:fade={{ duration: 300 }}
+		role="alert"
+	>
+		<div class="flex-shrink-0">
 			{#if toastProps.status === 'success'}
-				<CheckCircleSolid />
+				<Icon name="circle-check" class="h-6 w-6" />
 			{:else}
-				<CloseCircleSolid />
+				<Icon name="circle-x" class="h-6 w-6" />
 			{/if}
-		{/snippet}
-		<Toast
-			position={toastProps.position}
-			color={toastProps.color}
-			baseClass={getToastClasses(toastProps.status)}
-			iconClass="w-10 h-10 rounded-full"
-			transition={fade}
-			params={{ duration: 500, easing: linear }}
-			{icon}
-			onclose={clearToast}
+		</div>
+		<div class="flex-1">
+			<h4 class="text-sm font-semibold">
+				{toastProps.message}
+			</h4>
+		</div>
+		<button
+			class="flex-shrink-0 text-white hover:text-white/70"
+			onclick={clearToast}
+			aria-label="Close"
 		>
-			<div class="mt-3 flex items-center">
-				<div class="ms-3">
-					<h4 class="text-sm font-semibold text-text-900 dark:text-text-100">
-						{toastProps.message}
-					</h4>
-				</div>
-			</div></Toast
-		>
+			<Icon name="circle-x" class="h-5 w-5" />
+		</button>
 	</div>
 {/if}
 
 <div
-	class="mx-auto h-full w-full rounded-lg bg-surface-100 p-5 py-2.5 shadow-md sm:w-[95%] md:w-[90%] lg:w-[80%] dark:bg-fill-400"
+	class="mx-auto h-full w-full rounded-lg bg-surface-100 p-5 py-2.5 shadow-md sm:w-[95%] md:w-[90%] lg:w-[80%] dark:bg-surface-800"
 >
-	<Heading tag="h1" class="text-center text-tertiary-900 dark:text-tertiary-700"
-		>Welcome to the Batlow Environment Network</Heading
+	<h1 class="h1 text-center text-tertiary-600 dark:text-tertiary-400"
+		>Welcome to the Batlow Environment Network</h1
 	>
-	<Heading tag="h2" class="text-center text-tertiary-900 dark:text-tertiary-700"
-		>Community Information Infrastructure</Heading
+	<h2 class="h2 text-center text-tertiary-600 dark:text-tertiary-400"
+		>Community Information Infrastructure</h2
 	>
-	<p class="text-center text-xl text-text-800">
+	<p class="text-center text-xl text-surface-800 dark:text-surface-200">
 		Empowering neighborhoods with data-driven resilience
 	</p>
 

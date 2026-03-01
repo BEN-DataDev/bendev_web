@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { Button, Heading } from 'svelte-5-ui-lib';
+	
 	import EmailRegistrationInput from '$components/auth/EmailRegistrationInput.svelte';
 	import SocialMediaRegistrationInput from '$components/auth/SocialMediaRegistrationInput.svelte';
 
@@ -10,7 +10,7 @@
 	interface FormData {
 		email: string;
 		password: string;
-		provider?: 'email' | 'github' | 'discord';
+		provider?: 'email' | 'github' | 'discord' | 'google' | 'azure';
 		errors: {
 			email?: string;
 			password?: string;
@@ -69,7 +69,7 @@
 	}
 
 	function handleSocialSignIn(
-		event: CustomEvent<{ provider: 'email' | 'github' | 'discord' | undefined }>
+		event: CustomEvent<{ provider: 'email' | 'github' | 'discord' | 'google' | 'azure' | undefined }>
 	) {
 		const { provider } = event.detail;
 		formData.provider = provider;
@@ -110,10 +110,10 @@
 	<title>Registration Form</title>
 </svelte:head>
 
-<div class="mx-auto my-2.5 w-[400px] rounded-lg bg-gray-300 p-5 shadow-md dark:bg-gray-400">
-	<Heading tag="h3" class="text-center text-[#0509f7] dark:text-[#0509f7]">Register</Heading>
+<div class="card preset-outlined-surface-200-800 mx-auto my-2.5 w-[400px] p-5 shadow-md">
+	<h3 class="h3 text-center text-primary-600 dark:text-primary-400">Register</h3>
 	{#if formErrors.general}
-		<p class="mb-4 text-red-500">{formErrors.general}</p>
+		<p class="mb-4 text-error-500">{formErrors.general}</p>
 	{/if}
 	<form
 		id="registrationForm"
@@ -132,10 +132,10 @@
 			/>
 			<input type="hidden" name="password" bind:value={formData.password} />
 			{#if formErrors.email}
-				<p class="text-sm text-red-500">{formErrors.email}</p>
+				<p class="text-sm text-error-500">{formErrors.email}</p>
 			{/if}
 			{#if formErrors.password}
-				<p class="text-sm text-red-500">{formErrors.password}</p>
+				<p class="text-sm text-error-500">{formErrors.password}</p>
 			{/if}
 		{:else}
 			<input type="hidden" name="email" value="" />
@@ -144,12 +144,12 @@
 
 		<SocialMediaRegistrationInput on:socialSignIn={handleSocialSignIn} />
 		<input type="hidden" name="provider" bind:value={formData.provider} />
-		<Button
+		<button
 			type="submit"
-			class="mt-2.5 w-full cursor-pointer rounded bg-blue-500 py-2.5 text-white hover:bg-blue-600"
+			class="btn preset-filled-primary-500 mt-2.5 w-full cursor-pointer"
 			disabled={!submissionValid || loading}
 		>
 			{loading ? 'Submitting...' : 'Submit'}
-		</Button>
+		</button>
 	</form>
 </div>

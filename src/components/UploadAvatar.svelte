@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-	import { Label } from 'svelte-5-ui-lib';
 
 	interface Props {
 		firstName: string;
@@ -63,10 +62,10 @@
 				{#if initials}
 					<span class="initials">{initials}</span>
 				{:else}
-					<span class="text-sm text-red-300">Avatar</span>
+					<span class="text-sm text-error-300">Avatar</span>
 				{/if}
 			</div>
-			<Label for="avatar-input" color="gray">Upload an Avatar Image</Label>
+			<label for="avatar-input" class="text-surface-600 dark:text-surface-400">Upload an Avatar Image</label>
 		{/if}
 	</label>
 	<input

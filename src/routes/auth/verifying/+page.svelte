@@ -25,7 +25,7 @@
 </script>
 
 <div
-	class="mx-auto h-full w-full rounded-lg bg-gray-300 p-5 py-2.5 shadow-md sm:w-[95%] md:w-[90%] lg:w-[80%] dark:bg-gray-400"
+	class="card preset-outlined-surface-200-800 mx-auto h-full w-full p-5 py-2.5 shadow-md sm:w-[95%] md:w-[90%] lg:w-[80%]"
 >
 	{#if verified}
 		<h1>Email Verified!</h1>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
-	import { Button, Heading } from 'svelte-5-ui-lib';
+	
 	import PasswordSet from '$components/auth/PasswordSet.svelte';
 
 	import type { ActionData } from './$types';
@@ -68,11 +68,11 @@
 	<title>Set Password</title>
 </svelte:head>
 
-<div class="mx-auto my-2.5 w-[400px] rounded-lg bg-gray-300 p-5 shadow-md dark:bg-gray-400">
-	<Heading tag="h3" class="text-center text-[#0509f7] dark:text-[#0509f7]">Set Password</Heading>
+<div class="card preset-outlined-surface-200-800 mx-auto my-2.5 w-[400px] p-5 shadow-md">
+	<h3 class="h3 text-center text-primary-600 dark:text-primary-400">Set Password</h3>
 
 	{#if formErrors.general}
-		<p class="mb-4 text-red-500">{formErrors.general}</p>
+		<p class="mb-4 text-error-500">{formErrors.general}</p>
 	{/if}
 
 	<form id="setPasswordForm" action="?/setpassword" method="post" use:enhance={handleEnhance}>
@@ -84,14 +84,14 @@
 			required={true}
 		/>
 		{#if formErrors.password}
-			<p class="text-sm text-red-500">{formErrors.password}</p>
+			<p class="text-sm text-error-500">{formErrors.password}</p>
 		{/if}
-		<Button
+		<button
 			type="submit"
-			class="mt-2.5 w-full cursor-pointer rounded bg-blue-500 py-2.5 text-white hover:bg-blue-600"
+			class="btn preset-filled-primary-500 mt-2.5 w-full cursor-pointer"
 			disabled={!submissionValid || loading}
 		>
 			{loading ? 'Setting Password...' : 'Set Password'}
-		</Button>
+		</button>
 	</form>
 </div>

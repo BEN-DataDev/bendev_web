@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import ResponsiveLayout from '$components/structure/ThreePanelLayout.svelte';
-	import { UsersGroupSolid, UserSettingsSolid, UserCircleSolid } from 'flowbite-svelte-icons';
-	import { Button } from 'svelte-5-ui-lib';
+	import { Navigation } from '@skeletonlabs/skeleton-svelte';
+	import { browser } from '$app/environment';
+	import Icon from '$components/icons/Icons.svelte';
+
 	import type { LayoutData } from './$types';
 
 	interface Props {
@@ -10,56 +11,73 @@
 		children?: import('svelte').Snippet;
 	}
 
-	let leftSidebarOpen = $state(true);
-	let rightSidebarOpen = $state(true);
-
 	let { data, children }: Props = $props();
-	let pathName = $derived($page.url.pathname);
 	let userId = $derived(data.user?.id);
+	let pathName = $derived($page.url.pathname);
+
+	// Responsive layout detection
+	let innerWidth = $state(0);
+	let navLayout = $derived<'bar' | 'rail' | 'sidebar'>(
+		innerWidth < 768 ? 'bar' : innerWidth < 1024 ? 'rail' : 'sidebar'
+	);
+
 	$effect(() => {
-		console.log('users/[{userId}]/layout.svelte', pathName);
+		if (browser) {
+			innerWidth = window.innerWidth;
+			const handleResize = () => {
+				innerWidth = window.innerWidth;
+			};
+			window.addEventListener('resize', handleResize);
+			return () => window.removeEventListener('resize', handleResize);
+		}
 	});
 </script>
 
-<ResponsiveLayout
-	bind:leftSidebarOpen
-	bind:rightSidebarOpen
-	leftSidebarWidth="250px"
-	rightSidebarWidth="200px"
->
-	{#snippet leftSidebarContent()}
-		<div class="mt-4 space-y-4">
-			{#if pathName !== `/users/${userId}/communities`}
-				<Button href="/users/{userId}/communities" color="alternative" class="w-full">
-					<UsersGroupSolid class="me-2 h-4 w-4" />
-					Communities
-				</Button>
-			{/if}
+<div class="grid h-full {navLayout === 'bar' ? 'grid-rows-[1fr_auto]' : 'md:grid-cols-[auto_1fr]'}">
+	<!-- Main Content (on mobile, comes first; on desktop, comes second) -->
+	<div class="overflow-auto p-4 {navLayout === 'bar' ? 'order-1' : 'order-2'}">
+		{@render children?.()}
+	</div>
 
-			{#if pathName !== `/users/${userId}/profile`}
-				<Button href="/users/{userId}/profile" color="alternative" class="w-full">
-					<UserSettingsSolid class="me-2 h-4 w-4" />
-					Profile
-				</Button>
-			{/if}
+	<!-- Navigation (bottom on mobile, left on desktop) -->
+	<Navigation
+		layout={navLayout}
+		class="bg-surface-100 dark:bg-surface-800 {navLayout === 'bar'
+			? 'order-2 border-t border-surface-200 dark:border-surface-700'
+			: 'order-1 border-r border-surface-200 dark:border-surface-700'}"
+	>
+		<Navigation.Content>
+			<Navigation.Menu>
+				<Navigation.TriggerAnchor
+					href="/users/{userId}/dashboard"
+					class={pathName === `/users/${userId}/dashboard`
+						? 'bg-primary-500/10 text-primary-600 dark:text-primary-400'
+						: ''}
+				>
+					<Icon name="user" class="h-5 w-5" />
+					<Navigation.TriggerText>Dashboard</Navigation.TriggerText>
+				</Navigation.TriggerAnchor>
 
-			{#if pathName !== `/users/${userId}/dashboard`}
-				<Button href="/users/{userId}/dashboard" color="alternative" class="w-full">
-					<UserCircleSolid class="me-2 h-4 w-4" />
-					Dashboard
-				</Button>
-			{/if}
-		</div>
-	{/snippet}
+				<Navigation.TriggerAnchor
+					href="/users/{userId}/profile"
+					class={pathName === `/users/${userId}/profile`
+						? 'bg-primary-500/10 text-primary-600 dark:text-primary-400'
+						: ''}
+				>
+					<Icon name="user" class="h-5 w-5" />
+					<Navigation.TriggerText>Profile</Navigation.TriggerText>
+				</Navigation.TriggerAnchor>
 
-	{#snippet righttSidebarContent()}
-		<div class="space-y-4">
-			<h2 class="text-xl font-semibold text-gray-800">Right Sidebar</h2>
-			<div class="rounded-lg bg-white p-4 shadow">
-				<p class="text-gray-600">Additional information or widgets can go here.</p>
-			</div>
-		</div>
-	{/snippet}
-
-	{@render children?.()}
-</ResponsiveLayout>
+				<Navigation.TriggerAnchor
+					href="/users/{userId}/communities"
+					class={pathName === `/users/${userId}/communities`
+						? 'bg-primary-500/10 text-primary-600 dark:text-primary-400'
+						: ''}
+				>
+					<Icon name="user" class="h-5 w-5" />
+					<Navigation.TriggerText>Communities</Navigation.TriggerText>
+				</Navigation.TriggerAnchor>
+			</Navigation.Menu>
+		</Navigation.Content>
+	</Navigation>
+</div>

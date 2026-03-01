@@ -1,13 +1,7 @@
 <script lang="ts">
-	import { zxcvbn, zxcvbnOptions } from '@zxcvbn-ts/core';
-	import * as zxcvbnCommonPackage from '@zxcvbn-ts/language-common';
-	import * as zxcvbnEnPackage from '@zxcvbn-ts/language-en';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 
-	import { themeStore, type Theme } from '$stores/app';
-
-	import { EyeOutline, EyeSlashOutline } from 'flowbite-svelte-icons';
-	import { Heading, Input } from 'svelte-5-ui-lib';
+	import Icon from '$components/icons/Icons.svelte';
 
 	interface Props {
 		email: string;
@@ -28,17 +22,21 @@
 
 	const dispatch = createEventDispatcher();
 
-	const { translations } = zxcvbnEnPackage;
-	const { adjacencyGraphs: graphs, dictionary: commonDictionary } = zxcvbnCommonPackage;
-	const { dictionary: englishDictionary } = zxcvbnEnPackage;
+	let zxcvbnFn: ((password: string) => { score: number }) | null = null;
 
-	const options = {
-		translations,
-		graphs,
-		dictionary: { ...commonDictionary, ...englishDictionary }
-	};
-
-	zxcvbnOptions.setOptions(options);
+	onMount(async () => {
+		const [{ zxcvbn, zxcvbnOptions }, common, en] = await Promise.all([
+			import('@zxcvbn-ts/core'),
+			import('@zxcvbn-ts/language-common'),
+			import('@zxcvbn-ts/language-en')
+		]);
+		zxcvbnOptions.setOptions({
+			translations: en.translations,
+			graphs: common.adjacencyGraphs,
+			dictionary: { ...common.dictionary, ...en.dictionary }
+		});
+		zxcvbnFn = zxcvbn;
+	});
 
 	let show = $state(false);
 	let showAgain = $state(false);
@@ -49,7 +47,8 @@
 	}
 
 	function updatePasswordStrength() {
-		const result = zxcvbn(password);
+		if (!zxcvbnFn) return;
+		const result = zxcvbnFn(password);
 		const strength = result.score;
 		switch (strength) {
 			case 0:
@@ -79,24 +78,42 @@
 	let passwordsMatch = $derived(password === passwordConfirmation && password !== '');
 	let emailValid = $derived(validateEmail(email));
 
-	let currentTheme = $derived<Theme>($themeStore);
+	// Map strength class to Skeleton theme color classes
+	const strengthTextClass = $derived(
+		passwordStrengthClass === 'weak'
+			? 'text-error-500'
+			: passwordStrengthClass === 'fair'
+				? 'text-warning-500'
+				: passwordStrengthClass === 'good'
+					? 'text-secondary-500'
+					: passwordStrengthClass === 'strong'
+						? 'text-success-500'
+						: 'text-surface-400'
+	);
 
-	function getInputStyles(value: string): { backgroundColor: string; color: string } {
-		if (currentTheme === 'dark') {
-			return {
-				backgroundColor: value ? '#E8F0FE' : '#374151',
-				color: value ? '#374151' : '#F3F4F6'
-			};
-		} else {
-			return {
-				backgroundColor: value ? '#E8F0FE' : '#F9FAFB',
-				color: value ? '#374151' : '#D1D5DB'
-			};
-		}
-	}
+	const strengthBgClass = $derived(
+		passwordStrengthClass === 'weak'
+			? 'bg-error-500'
+			: passwordStrengthClass === 'fair'
+				? 'bg-warning-500'
+				: passwordStrengthClass === 'good'
+					? 'bg-secondary-500'
+					: passwordStrengthClass === 'strong'
+						? 'bg-success-500'
+						: 'bg-surface-300'
+	);
 
-	let passwordStyle = $derived(() => getInputStyles(password));
-	let passwordConfirmationStyle = $derived(() => getInputStyles(passwordConfirmation));
+	const strengthBarWidth = $derived(
+		passwordStrength === 'Weak'
+			? '25%'
+			: passwordStrength === 'Fair'
+				? '50%'
+				: passwordStrength === 'Good'
+					? '75%'
+					: passwordStrength === 'Strong'
+						? '100%'
+						: '0%'
+	);
 
 	$effect(() => {
 		onValidationChange(passwordsMatch && emailValid);
@@ -104,111 +121,77 @@
 	});
 </script>
 
-<Heading tag="h6" class="text-[#0509f7] dark:text-[#0509f7]"
-	>Register with Email and Password:</Heading
->
-<Input
+<h6 class="h6 text-primary-600 dark:text-primary-400">Register with Email and Password:</h6>
+<input
 	type="email"
-	class="my-1.5 w-full rounded-md border border-gray-300 p-2"
+	class="input my-1.5 w-full rounded-md border border-surface-300 bg-surface-50 p-2 dark:border-surface-600 dark:bg-surface-900"
 	name="email"
 	placeholder="Email"
 	autocomplete="email"
 	{required}
 	bind:value={email}
 />
-<Input
-	id="show-password1"
-	class="my-1.5 w-full rounded-md border border-gray-300 py-2 pl-10"
-	style="background-color: {passwordStyle().backgroundColor}; color: {passwordStyle().color};"
-	type={show ? 'text' : 'password'}
-	placeholder="Password"
-	autocomplete="current-password"
-	{required}
-	bind:value={password}
-	oninput={updatePasswordStrength}
->
-	{#snippet left()}
-		<button
-			onclick={(event) => {
-				event.preventDefault();
-				show = !show;
-			}}
-			class="pointer-events-auto"
-		>
-			{#if show}
-				<EyeOutline class="h-6 w-6" />
-			{:else}
-				<EyeSlashOutline class="h-6 w-6" />
-			{/if}
-		</button>
-	{/snippet}</Input
->
+<div class="relative my-1.5">
+	<button
+		type="button"
+		onclick={() => {
+			show = !show;
+		}}
+		class="absolute left-2 top-1/2 -translate-y-1/2 text-surface-600 hover:text-surface-900 dark:text-surface-400 dark:hover:text-surface-100"
+	>
+		{#if show}
+			<Icon name="eye" class="h-6 w-6" />
+		{:else}
+			<Icon name="eye-off" class="h-6 w-6" />
+		{/if}
+	</button>
+	<input
+		id="show-password1"
+		class="input w-full rounded-md border border-surface-300 bg-surface-50 py-2 pl-10 pr-2 dark:border-surface-600 dark:bg-surface-900"
+		type={show ? 'text' : 'password'}
+		placeholder="Password"
+		autocomplete="current-password"
+		{required}
+		bind:value={password}
+		oninput={updatePasswordStrength}
+	/>
+</div>
 <div class="mb-4 mt-2">
 	<div class="mb-1 flex justify-between">
-		<span class="text-sm font-medium text-gray-700">Password strength</span>
-		<span
-			class="text-sm font-medium"
-			style="color: {passwordStrengthClass === 'weak'
-				? '#d9534f'
-				: passwordStrengthClass === 'fair'
-					? '#f0ad4e'
-					: passwordStrengthClass === 'good'
-						? '#5bc0de'
-						: passwordStrengthClass === 'strong'
-							? '#5cb85c'
-							: '#d9534f'}">{passwordStrength}</span
-		>
+		<span class="text-sm font-medium text-surface-700 dark:text-surface-300">Password strength</span>
+		<span class="text-sm font-medium {strengthTextClass}">{passwordStrength}</span>
 	</div>
-	<div class="h-2.5 w-full rounded-full bg-gray-200">
+	<div class="h-2.5 w-full rounded-full bg-surface-200 dark:bg-surface-700">
 		<div
-			class="h-2.5 rounded-full transition-all duration-300 ease-in-out"
-			style="width: {passwordStrength === 'Weak'
-				? 25
-				: passwordStrength === 'Fair'
-					? 50
-					: passwordStrength === 'Good'
-						? 75
-						: passwordStrength === 'Strong'
-							? 100
-							: 0}%; background-color: {passwordStrengthClass === 'weak'
-				? '#d9534f'
-				: passwordStrengthClass === 'fair'
-					? '#f0ad4e'
-					: passwordStrengthClass === 'good'
-						? '#5bc0de'
-						: passwordStrengthClass === 'strong'
-							? '#5cb85c'
-							: '#d9534f'}"
+			class="h-2.5 rounded-full transition-all duration-300 ease-in-out {strengthBgClass}"
+			style="width: {strengthBarWidth}"
 		></div>
 	</div>
 </div>
-<Input
-	id="show-passwordAgain"
-	class="my-1.5 w-full rounded-md border border-gray-300 py-2 pl-10"
-	style="background-color: {passwordConfirmationStyle()
-		.backgroundColor}; color: {passwordConfirmationStyle().color};"
-	type={showAgain ? 'text' : 'password'}
-	placeholder="Password Again"
-	autocomplete="current-password"
-	{required}
-	bind:value={passwordConfirmation}
->
-	{#snippet left()}
-		<button
-			onclick={(event) => {
-				event.preventDefault();
-				showAgain = !showAgain;
-			}}
-			class="pointer-events-auto"
-		>
-			{#if showAgain}
-				<EyeOutline class="h-6 w-6" />
-			{:else}
-				<EyeSlashOutline class="h-6 w-6" />
-			{/if}
-		</button>
-	{/snippet}</Input
->
+<div class="relative my-1.5">
+	<button
+		type="button"
+		onclick={() => {
+			showAgain = !showAgain;
+		}}
+		class="absolute left-2 top-1/2 -translate-y-1/2 text-surface-600 hover:text-surface-900 dark:text-surface-400 dark:hover:text-surface-100"
+	>
+		{#if showAgain}
+			<Icon name="eye" class="h-6 w-6" />
+		{:else}
+			<Icon name="eye-off" class="h-6 w-6" />
+		{/if}
+	</button>
+	<input
+		id="show-passwordAgain"
+		class="input w-full rounded-md border border-surface-300 bg-surface-50 py-2 pl-10 pr-2 dark:border-surface-600 dark:bg-surface-900"
+		type={showAgain ? 'text' : 'password'}
+		placeholder="Password Again"
+		autocomplete="current-password"
+		{required}
+		bind:value={passwordConfirmation}
+	/>
+</div>
 {#if password && passwordConfirmation && !passwordsMatch}
-	<p class="mt-1 text-sm text-red-500">Passwords do not match</p>
+	<p class="mt-1 text-sm text-error-500">Passwords do not match</p>
 {/if}

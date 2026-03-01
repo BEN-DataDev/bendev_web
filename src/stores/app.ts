@@ -2,14 +2,13 @@ import { readable } from 'svelte/store';
 
 export type Theme = 'light' | 'dark';
 
-const THEME_PREFERENCE_KEY = 'THEME_PREFERENCE_KEY';
-
 export const themeStore = readable<Theme>('light', (set) => {
 	let observer: MutationObserver | undefined;
 	let currentTheme: Theme = 'light';
 
 	const updateTheme = () => {
-		const isDark = document.documentElement.classList.contains('dark');
+		// Skeleton v4 uses data-mode attribute on <html>, not class="dark"
+		const isDark = document.documentElement.getAttribute('data-mode') === 'dark';
 		const newTheme: Theme = isDark ? 'dark' : 'light';
 		if (newTheme !== currentTheme) {
 			currentTheme = newTheme;
@@ -18,28 +17,16 @@ export const themeStore = readable<Theme>('light', (set) => {
 	};
 
 	if (typeof window !== 'undefined') {
-		// Initial theme set
 		updateTheme();
 
-		// Watch for changes in the 'dark' class on the html element
+		// Watch for changes to data-mode on the html element (Skeleton v4)
 		observer = new MutationObserver(updateTheme);
-		observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+		observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-mode'] });
 
-		// Watch for changes in localStorage
-		const handleStorage = (event: StorageEvent) => {
-			if (event.key === THEME_PREFERENCE_KEY) {
-				updateTheme();
-			}
-		};
-		window.addEventListener('storage', handleStorage);
-
-		// Return cleanup function
 		return () => {
 			observer?.disconnect();
-			window.removeEventListener('storage', handleStorage);
 		};
 	}
 
-	// Return a no-op cleanup function if not in browser environment
 	return () => {};
 });

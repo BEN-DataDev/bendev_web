@@ -1,0 +1,16 @@
+/**
+ * Global Stylesheet
+ * Tailwind v4 + Skeleton Design System
+ */
+
+/* Tailwind CSS v4 */
+@import 'tailwindcss';
+
+/* Skeleton Core (Design System) */
+@import '@skeletonlabs/skeleton';
+
+/* Skeleton Svelte Components */
+@import '@skeletonlabs/skeleton-svelte';
+
+/* Custom bendev theme */
+@import '../theme-bendev.css';

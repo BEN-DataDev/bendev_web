@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { goto, invalidate } from '$app/navigation';
-	import { Button, Input, Heading } from 'svelte-5-ui-lib';
 	import UploadAvatar from '$components/UploadAvatar.svelte';
 	import type { ActionData } from './$types';
 	import type { SubmitFunction } from '@sveltejs/kit';
@@ -70,14 +69,14 @@
 	<title>Registration Form</title>
 </svelte:head>
 
-<div class="mx-auto my-2.5 w-[400px] rounded-lg bg-gray-300 p-5 shadow-md dark:bg-gray-400">
-	<Heading tag="h3" class="text-center text-[#0509f7] dark:text-[#0509f7]">Register</Heading>
+<div class="card preset-outlined-surface-200-800 mx-auto my-2.5 w-[400px] p-5 shadow-md">
+	<h3 class="h3 text-center text-primary-600 dark:text-primary-400">Register</h3>
 
 	{#if formErrors.general}
-		<p class="mb-4 text-red-500">{formErrors.general}</p>
+		<p class="mb-4 text-error-500">{formErrors.general}</p>
 	{/if}
 	{#if formErrors.update}
-		<p class="text-sm text-red-500">{formErrors.update}</p>
+		<p class="text-sm text-error-500">{formErrors.update}</p>
 	{/if}
 	<form
 		id="registrationForm"
@@ -86,9 +85,9 @@
 		enctype="multipart/form-data"
 		use:enhance={handleEnhance}
 	>
-		<Input
+		<input
 			type="text"
-			class="my-1.5 w-full rounded-md border border-gray-300 p-2"
+			class="input my-1.5 w-full rounded-md border border-surface-300 dark:border-surface-600 bg-surface-50 dark:bg-surface-900 p-2"
 			name="firstName"
 			placeholder="First Name"
 			autocomplete="given-name"
@@ -96,12 +95,12 @@
 			bind:value={formData.firstName}
 		/>
 		{#if formErrors.firstName}
-			<p class="text-sm text-red-500">{formErrors.firstName}</p>
+			<p class="text-sm text-error-500">{formErrors.firstName}</p>
 		{/if}
 
-		<Input
+		<input
 			type="text"
-			class="my-1.5 w-full rounded-md border border-gray-300 p-2"
+			class="input my-1.5 w-full rounded-md border border-surface-300 dark:border-surface-600 bg-surface-50 dark:bg-surface-900 p-2"
 			name="lastName"
 			placeholder="Last Name"
 			autocomplete="family-name"
@@ -109,7 +108,7 @@
 			bind:value={formData.lastName}
 		/>
 		{#if formErrors.lastName}
-			<p class="text-sm text-red-500">{formErrors.lastName}</p>
+			<p class="text-sm text-error-500">{formErrors.lastName}</p>
 		{/if}
 
 		<UploadAvatar
@@ -119,15 +118,15 @@
 			on:change={(e) => handleAvatarChange(e.detail)}
 		/>
 		{#if formErrors.avatar}
-			<p class="text-sm text-red-500">{formErrors.avatar}</p>
+			<p class="text-sm text-error-500">{formErrors.avatar}</p>
 		{/if}
 
-		<Button
+		<button
 			type="submit"
-			class="mt-2.5 w-full cursor-pointer rounded bg-blue-500 py-2.5 text-white hover:bg-blue-600"
+			class="btn preset-filled-primary-500 mt-2.5 w-full cursor-pointer"
 			disabled={!submissionValid || loading}
 		>
 			{loading ? 'Submitting...' : 'Submit'}
-		</Button>
+		</button>
 	</form>
 </div>

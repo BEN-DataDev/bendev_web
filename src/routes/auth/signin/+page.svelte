@@ -1,33 +1,7 @@
 <script lang="ts">
-	import { Button, Input, Heading } from 'svelte-5-ui-lib';
-	import { EyeOutline, EyeSlashOutline, GithubSolid, DiscordSolid } from 'flowbite-svelte-icons';
+	import Icon from '$components/icons/Icons.svelte';
 
-	import { themeStore, type Theme } from '$stores/app';
-
-	type ButtonColorType =
-		| 'primary'
-		| 'dark'
-		| 'alternative'
-		| 'light'
-		| 'secondary'
-		| 'gray'
-		| 'red'
-		| 'orange'
-		| 'amber'
-		| 'yellow'
-		| 'lime'
-		| 'green'
-		| 'emerald'
-		| 'teal'
-		| 'cyan'
-		| 'sky'
-		| 'blue'
-		| 'indigo'
-		| 'violet'
-		| 'purple'
-		| 'fuchsia'
-		| 'pink'
-		| 'rose';
+	type IconName = 'github' | 'moon' | 'sun' | 'user' | 'menu' | 'x' | 'eye' | 'eye-off' | 'circle-check' | 'circle-x' | 'chevrons-left' | 'chevrons-right' | 'chevrons-up' | 'chevrons-down' | 'settings' | 'user-circle' | 'users';
 
 	let email = $state('');
 	let password = $state('');
@@ -35,101 +9,82 @@
 	let emailValid = $derived(validateEmail(email));
 	let show = $state(false);
 
-	let currentTheme = $derived<Theme>($themeStore);
+	let submissionValid = $derived(emailValid && password.length >= 8);
 
-	let submissionValid = $derived(() => emailValid && password.length >= 8);
-
-	const socialProviders = $state([
-		{ name: 'GitHub', icon: GithubSolid, color: 'fuchsia', provider: 'github' },
-		{ name: 'Discord', icon: DiscordSolid, color: 'gray', provider: 'discord' }
+	const socialProviders = $state<Array<{ name: string; iconName: IconName; provider: string }>>([
+		{ name: 'GitHub', iconName: 'github' as IconName, provider: 'github' }
+		// TODO: Add Discord, Google, Microsoft icons when implementing social auth UI
 	]);
 
 	function validateEmail(email: string) {
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		return emailRegex.test(email);
 	}
-
-	function getInputStyles(value: string): { backgroundColor: string; color: string } {
-		if (currentTheme === 'dark') {
-			return {
-				backgroundColor: value ? '#E8F0FE' : '#374151',
-				color: value ? '#374151' : '#F3F4F6'
-			};
-		} else {
-			return {
-				backgroundColor: value ? '#E8F0FE' : '#F9FAFB',
-				color: value ? '#374151' : '#D1D5DB'
-			};
-		}
-	}
-
-	let passwordStyle = $derived(() => getInputStyles(password));
 </script>
 
-<div class="mx-auto my-2.5 w-[400px] rounded-lg bg-gray-300 p-5 shadow-md dark:bg-gray-400">
-	<Heading tag="h3" class="text-center text-[#0509f7] dark:text-[#0509f7]">Sign In</Heading>
+<div class="card preset-outlined-surface-200-800 mx-auto my-2.5 w-[400px] p-5 shadow-md">
+	<h3 class="h3 text-center text-primary-600 dark:text-primary-400">Sign In</h3>
 	<form id="signinForm" action="?/signin" method="post" class="space-y-4">
-		<Input
+		<input
 			type="email"
-			class="my-1.5 w-full rounded-md border border-gray-300 p-2"
+			class="input my-1.5 w-full rounded-md border border-surface-300 dark:border-surface-600 bg-surface-50 dark:bg-surface-900 p-2"
 			name="email"
 			placeholder="Email"
 			autocomplete="email"
-			required={true}
+			required
 			bind:value={email}
 		/>
-		<Input
-			id="password1"
-			class="my-1.5 w-full rounded-md border border-gray-300 py-2 pl-10"
-			style="background-color: {passwordStyle().backgroundColor}; color: {passwordStyle().color};"
-			type={show ? 'text' : 'password'}
-			placeholder="Password"
-			autocomplete="current-password"
-			required={true}
-			bind:value={password}
-		>
-			{#snippet left()}
-				<button
-					onclick={(event) => {
-						event.preventDefault();
-						show = !show;
-					}}
-					class="pointer-events-auto"
-				>
-					{#if show}
-						<EyeOutline class="h-6 w-6" />
-					{:else}
-						<EyeSlashOutline class="h-6 w-6" />
-					{/if}
-				</button>
-			{/snippet}</Input
-		>
+		<div class="relative my-1.5">
+			<button
+				type="button"
+				onclick={() => {
+					show = !show;
+				}}
+				class="absolute left-2 top-1/2 -translate-y-1/2 text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-100"
+			>
+				{#if show}
+					<Icon name="eye" class="h-6 w-6" />
+				{:else}
+					<Icon name="eye-off" class="h-6 w-6" />
+				{/if}
+			</button>
+			<input
+				id="password1"
+				class="input w-full rounded-md border border-surface-300 bg-surface-50 py-2 pl-10 pr-2 dark:border-surface-600 dark:bg-surface-900"
+				type={show ? 'text' : 'password'}
+				name="password"
+				placeholder="Password"
+				autocomplete="current-password"
+				required
+				bind:value={password}
+			/>
+		</div>
 		<p class="text-center">
-			Forgot Password? <a href="/auth/reset/password" class="text-blue-500 hover:underline"
+			Forgot Password? <a href="/auth/reset/password" class="text-primary-500 hover:underline"
 				>Reset Password</a
 			>
 		</p>
-		<Button type="submit" disabled={!submissionValid} class="w-full">Log In</Button>
+		<button type="submit" disabled={!submissionValid} class="btn preset-filled-primary-500 w-full">
+			Log In
+		</button>
 	</form>
 
 	<div class="mt-3">
-		<Heading tag="h6" class="pt-0 text-[#0509f7] dark:text-[#0509f7]">Or connect with:</Heading>
+		<h6 class="h6 pt-0 text-primary-600 dark:text-primary-400">Or connect with:</h6>
 		<div class="flex flex-col justify-center space-y-3">
-			{#each socialProviders as { name, icon: Icon, color, provider }}
-				<Button
-					size="sm"
-					color={color as ButtonColorType}
-					class="flex w-full items-center py-1.5 opacity-70"
+			{#each socialProviders as { name, iconName, provider }}
+				<a
+					class="btn preset-filled-secondary-500 flex w-full items-center justify-center py-1.5 text-sm opacity-70 hover:opacity-100"
 					href={`/auth/signin/${provider}`}
 				>
-					<Icon class="mr-2 h-5 w-5" />
+					<Icon name={iconName} class="mr-2 h-5 w-5" />
 					{name}
-				</Button>
+				</a>
 			{/each}
 		</div>
 	</div>
 
 	<p class="text-center">
-		Don't have an account? <a href="/auth/signup" class="text-blue-500 hover:underline">Sign up</a>
+		Don't have an account? <a href="/auth/signup" class="text-primary-500 hover:underline">Sign up</a>
 	</p>
 </div>
