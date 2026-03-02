@@ -119,6 +119,15 @@
 				</span>
 				<span class="shrink-0 text-xs text-surface-400">{layer.layer_type}</span>
 
+				<!-- Per-layer GeoJSON export -->
+				<a
+					href="/api/projects/{projectId}/export?layer={layer.id}"
+					class="btn preset-tonal-surface btn-sm px-1"
+					title="Export layer as GeoJSON"
+				>
+					↓
+				</a>
+
 				{#if canEdit}
 					<!-- Reorder -->
 					<button

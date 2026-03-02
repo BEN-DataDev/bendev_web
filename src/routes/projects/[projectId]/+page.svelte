@@ -103,13 +103,19 @@
 			<p class="text-sm">{project.public ? 'Public' : 'Private'}</p>
 		</div>
 
-		{#if canAdmin}
-			<div class="mt-auto border-t border-surface-200 pt-4 dark:border-surface-700">
+		<div class="mt-auto space-y-2 border-t border-surface-200 pt-4 dark:border-surface-700">
+			<a
+				href="/api/projects/{project.id}/export"
+				class="btn preset-tonal-surface btn-sm w-full"
+			>
+				↓ Export GeoJSON
+			</a>
+			{#if canAdmin}
 				<a href="/projects/{project.id}/users" class="btn preset-tonal-surface btn-sm w-full">
 					Manage Members
 				</a>
-			</div>
-		{/if}
+			{/if}
+		</div>
 	</aside>
 
 	<!-- Centre: map -->
