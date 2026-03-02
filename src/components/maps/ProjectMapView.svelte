@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type L from 'leaflet';
+	import { browser } from '$app/environment';
 	import LeafletMap from '$components/maps/leaflet/LeafletMap.svelte';
 	import LeafletGeoJSONPolygonLayer from '$components/maps/leaflet/layers/geojson/LeafletGeoJSONPolygonLayer.svelte';
 	import GeomanControls from '$components/maps/leaflet/controls/GeomanControls.svelte';
@@ -14,6 +15,8 @@
 		layers?: ProjectLayer[];
 		/** Show Geoman drawing controls for boundary editing. */
 		editable?: boolean;
+		/** Show a "Save as PNG" button overlaid on the map. */
+		showPrint?: boolean;
 		/** Fallback centre when no geometry is present (new project form). */
 		defaultCentre?: L.LatLngExpression;
 		/** Fallback zoom when no geometry is present. */
@@ -40,11 +43,37 @@
 		geometry = null,
 		layers = [],
 		editable = false,
+		showPrint = false,
 		defaultCentre = DEFAULT_CENTRE,
 		defaultZoom = DEFAULT_ZOOM,
 		class: klass = '',
 		onGeometryChange
 	}: Props = $props();
+
+	let mapContainerEl: HTMLDivElement | undefined = $state();
+	let saving = $state(false);
+
+	async function handleSaveAsPng() {
+		if (!browser || !mapContainerEl || saving) return;
+		saving = true;
+		try {
+			const { default: html2canvas } = await import('html2canvas');
+			const canvas = await html2canvas(mapContainerEl, {
+				useCORS: true,
+				logging: false,
+				allowTaint: false
+			});
+			const link = document.createElement('a');
+			link.download = 'map.png';
+			link.href = canvas.toDataURL('image/png');
+			link.click();
+		} catch {
+			// Fallback: browser print dialog
+			window.print();
+		} finally {
+			saving = false;
+		}
+	}
 
 	function styleFromLayer(layer: ProjectLayer): Record<string, unknown> {
 		const s = layer.style as LayerStyle | null;
@@ -116,7 +145,7 @@
 	};
 </script>
 
-<div class="h-full {klass}">
+<div bind:this={mapContainerEl} class="relative h-full {klass}">
 	<LeafletMap
 		baseLayers={OSM_BASE_LAYERS}
 		bounds={mapBounds}
@@ -165,4 +194,15 @@
 			<GeomanBoundaryCapture onCapture={onGeometryChange} />
 		{/if}
 	</LeafletMap>
+
+	{#if showPrint}
+		<button
+			onclick={handleSaveAsPng}
+			disabled={saving}
+			class="btn preset-filled-surface-200-800 btn-sm absolute right-2 top-2 z-[400] shadow-md"
+			title="Save map as PNG"
+		>
+			{saving ? 'Saving…' : 'Save as PNG'}
+		</button>
+	{/if}
 </div>
