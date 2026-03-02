@@ -1,12 +1,69 @@
 <script lang="ts">
-	import type { PageData } from './$types';
+	import { enhance } from '$app/forms';
+	import ProjectMapView from '$components/maps/ProjectMapView.svelte';
+	import type { PageData, ActionData } from './$types';
 
 	interface Props {
 		data: PageData;
-		children?: import('svelte').Snippet;
+		form: ActionData;
 	}
 
-	let { data }: Props = $props();
+	let { data: _data, form }: Props = $props();
+
+	let drawnGeometry = $state('');
+
+	function handleGeometryChange(geometry: GeoJSON.Geometry | null) {
+		drawnGeometry = geometry ? JSON.stringify(geometry) : '';
+	}
 </script>
 
-// TODO New community page
+<div class="flex h-full flex-col">
+	<header class="border-b border-surface-200 p-4 dark:border-surface-700">
+		<div class="flex items-center gap-2">
+			<a href="/communities" class="btn preset-tonal-surface btn-sm">← Communities</a>
+			<h1 class="h3">New Community</h1>
+		</div>
+	</header>
+
+	<div class="flex-1 overflow-y-auto">
+		<form method="POST" use:enhance class="grid h-full grid-cols-1 gap-0 lg:grid-cols-2">
+			<!-- Left: form fields -->
+			<div class="space-y-4 overflow-y-auto border-r border-surface-200 p-6 dark:border-surface-700">
+				{#if form?.error}
+					<p class="text-sm text-error-500">{form.error}</p>
+				{/if}
+
+				<label class="block">
+					<span class="mb-1 block text-sm font-medium"
+						>Community Name <span class="text-error-500">*</span></span
+					>
+					<input
+						type="text"
+						name="name"
+						class="input w-full"
+						required
+						placeholder="Enter community name"
+					/>
+				</label>
+
+				<label class="flex items-center gap-2">
+					<input type="checkbox" name="public" class="checkbox" checked />
+					<span class="text-sm">Make community public</span>
+				</label>
+
+				<p class="text-xs text-surface-500">
+					Draw the community boundary on the map. <span class="text-error-500">*</span>
+				</p>
+
+				<input type="hidden" name="extent_geojson" value={drawnGeometry} />
+
+				<button type="submit" class="btn preset-filled-primary-500 w-full">Create Community</button>
+			</div>
+
+			<!-- Right: map -->
+			<div class="h-[400px] lg:h-full">
+				<ProjectMapView editable={true} onGeometryChange={handleGeometryChange} />
+			</div>
+		</form>
+	</div>
+</div>

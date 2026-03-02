@@ -56,7 +56,10 @@
 	<!-- Left sidebar: community list -->
 	<aside class="overflow-y-auto border-r border-surface-200 p-4 dark:border-surface-700">
 		<div class="space-y-4">
-			<h4 class="h4">Communities</h4>
+			<div class="flex items-center justify-between">
+				<h4 class="h4">Communities</h4>
+				<a href="/communities/new" class="btn preset-filled-primary-500 btn-sm">+ New</a>
+			</div>
 			<input
 				type="search"
 				class="input"
@@ -106,7 +109,10 @@
 	<!-- Right sidebar: community details (desktop only) -->
 	<aside class="hidden overflow-y-auto border-l border-surface-200 p-4 dark:border-surface-700 lg:block">
 		{#if currentCommunity}
-			<h4 class="h4">{currentCommunity.name}</h4>
+			<div class="flex items-center justify-between gap-2">
+				<h4 class="h4">{currentCommunity.name}</h4>
+				<a href="/communities/{currentCommunity.id}" class="btn preset-tonal-surface btn-sm shrink-0">View →</a>
+			</div>
 
 			{#if currentCommunity.communityinfo}
 				<div class="card preset-outlined-surface-200-800 mt-4">
