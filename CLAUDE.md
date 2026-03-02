@@ -38,7 +38,7 @@ This project uses an AI-assisted development system for design documentation, co
 | **Project name** | bendev-web |
 | **Domain** | Community Environmental Management |
 | **Design docs** | `~/projects/ai/ai-dev-system/projects/bendev-web/design/` |
-| **Current iteration** | v0.3 (Skeleton v4 migration complete — 2026-03-01) |
+| **Current iteration** | v0.4 (Core feature build — Projects, Communities, Users, Layers, Attachments, Export) |
 | **Related project** | community-orgs-portal (same repo) |
 
 ## Technology Stack
@@ -50,7 +50,7 @@ This project uses an AI-assisted development system for design documentation, co
 | **CSS** | Tailwind v4 (Vite plugin — no postcss config, no tailwind.config.ts) | tailwindcss ^4.1.18 |
 | **Backend** | Supabase (PostgreSQL + PostGIS + Auth) | @supabase/supabase-js ^2.45.6 |
 | **Spatial** | PostGIS | — |
-| **Mapping** | TBD (Leaflet or OpenLayers) | — |
+| **Mapping** | Leaflet + Geoman | leaflet ^1.x, @geoman-io/leaflet-geoman-free |
 
 ## Completed Migrations
 

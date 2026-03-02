@@ -7,10 +7,30 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "14.1"
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
   public: {
     Tables: {
@@ -261,7 +281,7 @@ export type Database = {
           description: string | null
           display_order: number
           editable: boolean
-          geojson_data: Json | null
+          geometry: unknown
           id: string
           last_updated: string
           layer_type: string
@@ -277,7 +297,7 @@ export type Database = {
           description?: string | null
           display_order?: number
           editable?: boolean
-          geojson_data?: Json | null
+          geometry?: unknown
           id?: string
           last_updated?: string
           layer_type: string
@@ -293,7 +313,7 @@ export type Database = {
           description?: string | null
           display_order?: number
           editable?: boolean
-          geojson_data?: Json | null
+          geometry?: unknown
           id?: string
           last_updated?: string
           layer_type?: string
@@ -529,6 +549,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_project: {
+        Args: {
+          p_boundary_geojson?: string
+          p_community_id?: string
+          p_description?: string
+          p_end_date?: string
+          p_name: string
+          p_public?: boolean
+          p_start_date?: string
+          p_status?: string
+        }
+        Returns: string
+      }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
       dev_download_crownlands: {
         Args: { delay_seconds?: number; use_get?: boolean }
@@ -566,6 +599,24 @@ export type Database = {
           public: boolean
         }[]
       }
+      get_project: {
+        Args: { p_id: string }
+        Returns: {
+          boundary: Json
+          bounds: number[]
+          community_id: string
+          community_name: string
+          created_at: string
+          description: string
+          end_date: string
+          id: string
+          last_updated: string
+          projectname: string
+          public: boolean
+          start_date: string
+          status: string
+        }[]
+      }
       get_user_roles: { Args: { user_id: string }; Returns: Json }
       health_check: { Args: never; Returns: Json }
       remove_user_from_community: {
@@ -577,6 +628,20 @@ export type Database = {
         Returns: undefined
       }
       sync_existing_users: { Args: never; Returns: undefined }
+      update_project: {
+        Args: {
+          p_boundary_geojson?: string
+          p_community_id?: string
+          p_description?: string
+          p_end_date?: string
+          p_id: string
+          p_name: string
+          p_public?: boolean
+          p_start_date?: string
+          p_status?: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       role_name:
@@ -715,6 +780,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       role_name: [
@@ -732,3 +800,4 @@ export const Constants = {
     },
   },
 } as const
+

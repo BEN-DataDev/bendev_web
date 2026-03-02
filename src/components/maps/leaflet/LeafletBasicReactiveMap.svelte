@@ -41,10 +41,8 @@
 				// Wait for next tick to ensure map is ready
 				setTimeout(() => {
 					if (bounds && bounds[0] && bounds[1]) {
-						console.log('Setting bounds:', bounds);
 						leafletMap?.invalidateSize();
 						leafletMap?.fitBounds(bounds);
-						console.log('Set bounds:', leafletMap?.getBounds());
 					}
 				}, 100);
 			});
@@ -55,8 +53,6 @@
 		if (leafletMap) {
 			if (bounds) {
 				leafletMap.fitBounds(bounds);
-				console.log('Bounds:', bounds);
-				console.log('Bounds Changed:', leafletMap.getBounds());
 			}
 		}
 	});
