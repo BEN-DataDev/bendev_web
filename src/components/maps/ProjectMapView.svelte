@@ -4,10 +4,14 @@
 	import LeafletGeoJSONPolygonLayer from '$components/maps/leaflet/layers/geojson/LeafletGeoJSONPolygonLayer.svelte';
 	import GeomanControls from '$components/maps/leaflet/controls/GeomanControls.svelte';
 	import GeomanBoundaryCapture from '$components/maps/leaflet/controls/GeomanBoundaryCapture.svelte';
+	import type { ProjectLayer } from '$components/projects/LayerPanel.svelte';
+	import type { LayerStyle } from '$components/projects/LayerStyleEditor.svelte';
 
 	interface Props {
 		/** Project boundary to display; auto-fits the map when present. */
 		geometry?: GeoJSON.Geometry | null;
+		/** Overlay layers to render on top of the boundary. */
+		layers?: ProjectLayer[];
 		/** Show Geoman drawing controls for boundary editing. */
 		editable?: boolean;
 		/** Fallback centre when no geometry is present (new project form). */
@@ -34,12 +38,23 @@
 
 	let {
 		geometry = null,
+		layers = [],
 		editable = false,
 		defaultCentre = DEFAULT_CENTRE,
 		defaultZoom = DEFAULT_ZOOM,
 		class: klass = '',
 		onGeometryChange
 	}: Props = $props();
+
+	function styleFromLayer(layer: ProjectLayer): Record<string, unknown> {
+		const s = layer.style as LayerStyle | null;
+		return {
+			colour: s?.colour ?? '#6366f1',
+			fillColour: s?.fillColour ?? '#6366f1',
+			fillOpacity: s?.fillOpacity ?? 0.3,
+			weight: s?.weight ?? 2
+		};
+	}
 
 	/** Compute Leaflet-compatible bounds [[lat_min, lon_min], [lat_max, lon_max]] from GeoJSON. */
 	function boundsFromGeometry(
@@ -120,6 +135,20 @@
 				polygonOptions={boundaryStyle}
 			/>
 		{/if}
+		{#each layers as layer (layer.id)}
+			{#if layer.visible && layer.geojson}
+				<LeafletGeoJSONPolygonLayer
+					geojsonData={layer.geojson}
+					layerName={layer.name}
+					visible={true}
+					editable={false}
+					staticLayer={false}
+					showInLegend={true}
+					polygonOptions={styleFromLayer(layer)}
+				/>
+			{/if}
+		{/each}
+
 		{#if editable}
 			<GeomanControls
 				drawMarker={false}

@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import ProjectMapView from '$components/maps/ProjectMapView.svelte';
+	import LayerPanel, { type ProjectLayer } from '$components/projects/LayerPanel.svelte';
 	import type { PageData } from './$types';
 
 	interface Props {
@@ -7,7 +9,14 @@
 	}
 
 	let { data }: Props = $props();
-	let { project, layers, members, canEdit, canAdmin } = $derived(data);
+	let { project, members, canEdit, canAdmin } = $derived(data);
+
+	// Layer state — initialised from server data, refreshed via API after mutations
+	let layers = $state<ProjectLayer[]>(untrack(() => (data.layers as ProjectLayer[]) ?? []));
+
+	$effect(() => {
+		layers = data.layers as ProjectLayer[];
+	});
 
 	let activeTab = $state<'layers' | 'documents' | 'members'>('layers');
 
@@ -21,6 +30,13 @@
 	const boundary = $derived(
 		project.boundary ? (project.boundary as GeoJSON.Geometry) : null
 	);
+
+	async function refreshLayers() {
+		const res = await fetch(`/api/projects/${project.id}/layers`);
+		if (res.ok) {
+			layers = (await res.json()) as ProjectLayer[];
+		}
+	}
 </script>
 
 <div class="grid h-full grid-cols-1 lg:grid-cols-[280px_1fr_320px]">
@@ -82,14 +98,14 @@
 
 	<!-- Centre: map -->
 	<main class="h-full overflow-hidden">
-		<ProjectMapView geometry={boundary} />
+		<ProjectMapView geometry={boundary} {layers} />
 	</main>
 
 	<!-- Right: tabbed panel -->
 	<aside class="hidden flex-col border-l border-surface-200 dark:border-surface-700 lg:flex">
 		<!-- Tab bar -->
 		<div class="flex border-b border-surface-200 dark:border-surface-700">
-			{#each [['layers', 'Layers'], ['documents', 'Documents'], ['members', 'Members']] as [tab, label]}
+			{#each [['layers', 'Layers'], ['documents', 'Documents'], ['members', 'Members']] as [tab, label] (tab)}
 				<button
 					class="flex-1 py-2 text-sm font-medium transition-colors {activeTab === tab
 						? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400'
@@ -104,21 +120,7 @@
 		<!-- Tab content -->
 		<div class="flex-1 overflow-y-auto p-4">
 			{#if activeTab === 'layers'}
-				{#if layers.length === 0}
-					<p class="text-sm text-surface-500">No layers yet.</p>
-				{:else}
-					<ul class="space-y-2">
-						{#each layers as layer}
-							<li class="card preset-outlined-surface-200-800 p-2 text-sm">
-								<span class="font-medium">{layer.name}</span>
-								<span class="ml-2 text-xs text-surface-500">{layer.layer_type}</span>
-							</li>
-						{/each}
-					</ul>
-				{/if}
-				{#if canEdit}
-					<p class="mt-4 text-xs text-surface-400">Layer upload available in Phase 2.</p>
-				{/if}
+				<LayerPanel {layers} projectId={project.id} {canEdit} onLayersChanged={refreshLayers} />
 
 			{:else if activeTab === 'documents'}
 				<p class="text-sm text-surface-500">Document attachments available in Phase 3.</p>
@@ -128,13 +130,13 @@
 					<p class="text-sm text-surface-500">No members.</p>
 				{:else}
 					<ul class="space-y-2">
-						{#each members as m}
+						{#each members as m (m.user_id)}
 							<li class="text-sm">
 								{#if m.userprofile}
-								{((m.userprofile as { firstname: string; lastname: string }[] | null)?.[0])?.firstname ?? ''}
-								{((m.userprofile as { firstname: string; lastname: string }[] | null)?.[0])?.lastname ?? ''}
+									{((m.userprofile as { firstname: string; lastname: string }[] | null)?.[0])?.firstname ?? ''}
+									{((m.userprofile as { firstname: string; lastname: string }[] | null)?.[0])?.lastname ?? ''}
 								{:else}
-								{m.user_id}
+									{m.user_id}
 								{/if}
 							</li>
 						{/each}

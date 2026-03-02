@@ -17,11 +17,9 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 	const project = rows[0];
 
-	const { data: layers } = await locals.supabase
-		.from('project_layers')
-		.select('id, name, layer_type, visible, display_order, style, source_url')
-		.eq('project_id', projectId)
-		.order('display_order');
+	const { data: layers } = await locals.supabase.rpc('get_project_layers', {
+		p_project_id: projectId
+	});
 
 	const { data: members } = await locals.supabase
 		.from('projects_users')
