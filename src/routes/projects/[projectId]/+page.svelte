@@ -2,6 +2,8 @@
 	import { untrack } from 'svelte';
 	import ProjectMapView from '$components/maps/ProjectMapView.svelte';
 	import LayerPanel, { type ProjectLayer } from '$components/projects/LayerPanel.svelte';
+	import AttachmentList, { type Attachment } from '$components/projects/AttachmentList.svelte';
+	import ImageGallery from '$components/projects/ImageGallery.svelte';
 	import type { PageData } from './$types';
 
 	interface Props {
@@ -16,6 +18,13 @@
 
 	$effect(() => {
 		layers = data.layers as ProjectLayer[];
+	});
+
+	// Attachment state — initialised from server data, refreshed via API after mutations
+	let attachments = $state<Attachment[]>(untrack(() => (data.attachments as Attachment[]) ?? []));
+
+	$effect(() => {
+		attachments = data.attachments as Attachment[];
 	});
 
 	let activeTab = $state<'layers' | 'documents' | 'members'>('layers');
@@ -35,6 +44,13 @@
 		const res = await fetch(`/api/projects/${project.id}/layers`);
 		if (res.ok) {
 			layers = (await res.json()) as ProjectLayer[];
+		}
+	}
+
+	async function refreshAttachments() {
+		const res = await fetch(`/api/projects/${project.id}/attachments`);
+		if (res.ok) {
+			attachments = (await res.json()) as Attachment[];
 		}
 	}
 </script>
@@ -123,7 +139,15 @@
 				<LayerPanel {layers} projectId={project.id} {canEdit} onLayersChanged={refreshLayers} />
 
 			{:else if activeTab === 'documents'}
-				<p class="text-sm text-surface-500">Document attachments available in Phase 3.</p>
+				<div class="space-y-4">
+					<ImageGallery {attachments} />
+					<AttachmentList
+						{attachments}
+						projectId={project.id}
+						{canEdit}
+						onAttachmentsChanged={refreshAttachments}
+					/>
+				</div>
 
 			{:else if activeTab === 'members'}
 				{#if members.length === 0}

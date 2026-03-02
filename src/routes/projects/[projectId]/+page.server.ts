@@ -26,6 +26,21 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		.select('user_id, userprofile:userprofile(firstname, lastname)')
 		.eq('project_id', projectId);
 
+	const { data: rawAttachments } = await locals.supabase
+		.from('project_attachments')
+		.select('id, file_name, file_path, file_type, file_size, category, description, created_at')
+		.eq('project_id', projectId)
+		.order('created_at', { ascending: false });
+
+	const IMAGE_BUCKET = 'project-images';
+	const attachments = (rawAttachments ?? []).map((a) => ({
+		...a,
+		public_url:
+			a.category === 'image'
+				? locals.supabase.storage.from(IMAGE_BUCKET).getPublicUrl(a.file_path).data.publicUrl
+				: null
+	}));
+
 	const userProjectRole =
 		roles.find((r) => r.role_type === 'project' && r.entity_id === projectId)?.role_name ?? null;
 
@@ -36,6 +51,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		project,
 		layers: layers ?? [],
 		members: members ?? [],
+		attachments,
 		userId: user.id,
 		userProjectRole,
 		canEdit,
